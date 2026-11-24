@@ -1,0 +1,312 @@
+/*
+ * Tailwind v4 entry: config lives here, with no tailwind.config.js or PostCSS plugin.
+ * Keep every @import in this top block. Web fonts load via <link> in src/routes/__root.tsx.
+ */
+@import "tailwindcss" source(none);
+@source "../src";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/*
+ * Daryeel Wellness design system.
+ * Palette is extracted from the official logo: deep logo green, vibrant lime,
+ * a deep botanical "forest" for important sections, and white / pale sage surfaces.
+ */
+
+@theme inline {
+  --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Fraunces", ui-serif, Georgia, serif;
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 14px);
+  --radius-4xl: calc(var(--radius) + 22px);
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-ring-offset-background: var(--background);
+
+  --color-lime: var(--lime);
+  --color-lime-foreground: var(--lime-foreground);
+  --color-forest: var(--forest);
+  --color-forest-foreground: var(--forest-foreground);
+  --color-forest-muted: var(--forest-muted);
+  --color-sage: var(--sage);
+  --color-whatsapp: var(--whatsapp);
+  --color-whatsapp-foreground: var(--whatsapp-foreground);
+
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  --animate-float: float 7s ease-in-out infinite;
+  --animate-float-slow: float 10s ease-in-out infinite;
+  --animate-drift: drift 18s ease-in-out infinite alternate;
+  --animate-marquee: marquee 40s linear infinite;
+}
+
+:root {
+  --radius: 0.875rem;
+
+  /* Surfaces */
+  --background: oklch(0.992 0.006 120);
+  --foreground: oklch(0.24 0.045 148);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.24 0.045 148);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.24 0.045 148);
+  --sage: oklch(0.968 0.022 125);
+
+  /* Brand */
+  --primary: oklch(0.49 0.15 138); /* logo green */
+  --primary-foreground: oklch(0.99 0.01 120);
+  --lime: oklch(0.86 0.19 115); /* logo lime */
+  --lime-foreground: oklch(0.24 0.06 145);
+  --forest: oklch(0.27 0.06 146); /* deep botanical */
+  --forest-foreground: oklch(0.97 0.02 118);
+  --forest-muted: oklch(0.8 0.04 130);
+
+  --secondary: oklch(0.955 0.035 125);
+  --secondary-foreground: oklch(0.3 0.07 145);
+  --muted: oklch(0.965 0.014 125);
+  --muted-foreground: oklch(0.47 0.035 145);
+  --accent: oklch(0.95 0.07 118);
+  --accent-foreground: oklch(0.3 0.08 140);
+  --destructive: oklch(0.577 0.215 27.325);
+  --destructive-foreground: oklch(0.99 0 0);
+  --border: oklch(0.915 0.022 128);
+  --input: oklch(0.9 0.025 128);
+  --ring: oklch(0.6 0.15 135);
+
+  --whatsapp: oklch(0.72 0.19 150);
+  --whatsapp-foreground: oklch(0.99 0 0);
+
+  /* Gradients */
+  --gradient-hero:
+    radial-gradient(60% 70% at 85% 20%, color-mix(in oklab, var(--lime) 35%, transparent) 0%, transparent 60%),
+    radial-gradient(50% 60% at 10% 90%, color-mix(in oklab, var(--primary) 18%, transparent) 0%, transparent 70%),
+    linear-gradient(180deg, var(--sage) 0%, var(--background) 100%);
+  --gradient-forest: linear-gradient(150deg, oklch(0.31 0.07 145) 0%, var(--forest) 55%, oklch(0.22 0.05 150) 100%);
+  --gradient-brand: linear-gradient(120deg, var(--primary) 0%, oklch(0.62 0.17 128) 55%, var(--lime) 100%);
+  --gradient-card: linear-gradient(160deg, oklch(1 0 0) 0%, var(--sage) 100%);
+
+  /* Shadows */
+  --shadow-soft: 0 1px 2px oklch(0.27 0.06 146 / 0.04), 0 8px 24px -12px oklch(0.27 0.06 146 / 0.12);
+  --shadow-lift: 0 2px 4px oklch(0.27 0.06 146 / 0.05), 0 24px 48px -20px oklch(0.27 0.06 146 / 0.28);
+  --shadow-product: 0 30px 40px -24px oklch(0.27 0.06 146 / 0.45);
+  --shadow-glow: 0 10px 40px -10px color-mix(in oklab, var(--lime) 70%, transparent);
+
+  --chart-1: var(--primary);
+  --chart-2: var(--lime);
+  --chart-3: var(--forest);
+  --chart-4: oklch(0.7 0.12 130);
+  --chart-5: oklch(0.8 0.1 100);
+  --sidebar: var(--background);
+  --sidebar-foreground: var(--foreground);
+  --sidebar-primary: var(--primary);
+  --sidebar-primary-foreground: var(--primary-foreground);
+  --sidebar-accent: var(--secondary);
+  --sidebar-accent-foreground: var(--secondary-foreground);
+  --sidebar-border: var(--border);
+  --sidebar-ring: var(--ring);
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+  html {
+    scroll-behavior: smooth;
+    -webkit-tap-highlight-color: transparent;
+  }
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+    font-feature-settings: "ss01", "cv11";
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+  h1,
+  h2,
+  h3,
+  .font-display {
+    font-family: var(--font-display);
+    font-optical-sizing: auto;
+    letter-spacing: -0.02em;
+  }
+  ::selection {
+    background: var(--lime);
+    color: var(--lime-foreground);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+@keyframes float {
+  0%, 100% { transform: translate3d(0, 0, 0) rotate(var(--r, 0deg)); }
+  50% { transform: translate3d(0, -14px, 0) rotate(calc(var(--r, 0deg) + 1.5deg)); }
+}
+@keyframes drift {
+  0% { transform: translate3d(0, 0, 0) scale(1); }
+  100% { transform: translate3d(4%, -6%, 0) scale(1.12); }
+}
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+@keyframes preloader-out {
+  0%, 70% { opacity: 1; visibility: visible; }
+  100% { opacity: 0; visibility: hidden; }
+}
+@keyframes preloader-logo {
+  0% { opacity: 0; transform: translateY(8px) scale(0.96); }
+  40%, 100% { opacity: 1; transform: none; }
+}
+@keyframes preloader-bar {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
+@utility container-page {
+  width: 100%;
+  max-width: 80rem;
+  margin-inline: auto;
+  padding-inline: 1.25rem;
+  @media (min-width: 640px) {
+    padding-inline: 2rem;
+  }
+}
+
+@utility bg-hero {
+  background: var(--gradient-hero);
+}
+@utility bg-forest-gradient {
+  background: var(--gradient-forest);
+}
+@utility bg-brand-gradient {
+  background: var(--gradient-brand);
+}
+@utility bg-card-gradient {
+  background: var(--gradient-card);
+}
+@utility text-brand-gradient {
+  background: var(--gradient-brand);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+@utility shadow-soft {
+  box-shadow: var(--shadow-soft);
+}
+@utility shadow-lift {
+  box-shadow: var(--shadow-lift);
+}
+@utility shadow-glow {
+  box-shadow: var(--shadow-glow);
+}
+@utility drop-product {
+  filter: drop-shadow(var(--shadow-product));
+}
+
+/* Frosted glass surface for light sections */
+@utility glass {
+  background: color-mix(in oklab, var(--card) 68%, transparent);
+  backdrop-filter: blur(18px) saturate(150%);
+  border: 1px solid color-mix(in oklab, var(--card) 80%, transparent);
+}
+/* Nearly opaque glass for menus that sit over any section */
+@utility glass-strong {
+  background: color-mix(in oklab, var(--card) 94%, transparent);
+  backdrop-filter: blur(20px) saturate(150%);
+  border: 1px solid var(--border);
+}
+/* Frosted glass surface for forest sections */
+@utility glass-dark {
+  background: color-mix(in oklab, var(--forest-foreground) 7%, transparent);
+  backdrop-filter: blur(16px) saturate(140%);
+  border: 1px solid color-mix(in oklab, var(--forest-foreground) 14%, transparent);
+}
+
+/* Soft blurred blobs used as animated decoration */
+@utility blob {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(60px);
+  pointer-events: none;
+  animation: var(--animate-drift);
+}
+
+/* Fine leaf-vein texture used on forest sections */
+@utility leaf-pattern {
+  background-image: radial-gradient(color-mix(in oklab, var(--lime) 18%, transparent) 1px, transparent 1px);
+  background-size: 22px 22px;
+}
+
+@utility eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--primary);
+}
+
+@utility preloader {
+  animation: preloader-out 1.3s ease forwards;
+}
+@utility preloader-logo {
+  animation: preloader-logo 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+@utility preloader-bar {
+  transform-origin: left;
+  animation: preloader-bar 1s cubic-bezier(0.6, 0, 0.2, 1) both;
+}
+
+@utility perspective {
+  perspective: 1200px;
+}
