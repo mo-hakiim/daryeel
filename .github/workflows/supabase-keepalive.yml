@@ -25,7 +25,6 @@ jobs:
           fi
           status=$(curl -sS -o /dev/null -w "%{http_code}" \
             -H "apikey: $SUPABASE_ANON_KEY" \
-            -H "Authorization: Bearer $SUPABASE_ANON_KEY" \
             "${SUPABASE_URL%/}/rest/v1/categories?select=id&limit=1")
           echo "Supabase responded with HTTP $status"
           test "$status" = "200"

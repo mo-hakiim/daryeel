@@ -43,7 +43,13 @@ async function request(path: string, init: RequestInit & { token?: string | unde
     const res = await fetch(`${SUPABASE_URL}${path}`, {
       ...rest,
       signal: ctrl.signal,
-      headers: { apikey: ANON_KEY, authorization: `Bearer ${token ?? ANON_KEY}`, ...headers },
+      // Anonymous requests send only the public key (works with legacy anon JWTs and the
+      // newer sb_publishable_ keys); signed-in requests add the user's access token.
+      headers: {
+        apikey: ANON_KEY,
+        ...(token ? { authorization: `Bearer ${token}` } : {}),
+        ...headers,
+      },
     });
     const text = await res.text();
     const body = text ? safeJson(text) : null;
