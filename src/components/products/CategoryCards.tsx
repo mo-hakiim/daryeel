@@ -2,16 +2,18 @@ import { Link } from "@tanstack/react-router";
 import { motion } from "motion/react";
 import { ArrowRight } from "lucide-react";
 
-import { CATEGORY_COVER, CATEGORY_IDS } from "@/data/catalog";
 import { productImage } from "@/data/images";
-import { productsIn } from "@/data/products";
+import { categoryCover, useCatalog } from "@/data/store";
 import { fill, useI18n } from "@/i18n";
+import { cn } from "@/lib/utils";
 
 export function CategoryCards() {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
+  const { categories, products, productsIn } = useCatalog();
   return (
-    <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-      {CATEGORY_IDS.map((c, i) => {
+    <div className={cn("grid gap-5 sm:grid-cols-2", categories.length % 3 === 0 ? "lg:grid-cols-3" : "lg:grid-cols-4")}>
+      {categories.map((cat, i) => {
+        const c = cat.slug;
         const count = productsIn(c).length;
         return (
           <motion.div
@@ -31,11 +33,11 @@ export function CategoryCards() {
               <span className="relative text-xs font-bold uppercase tracking-[0.16em] text-primary">
                 {fill(t.common.productsCount, { n: count })}
               </span>
-              <h3 className="relative mt-2 font-display text-2xl leading-tight">{t.categories[c].name}</h3>
-              <p className="relative mt-1 text-sm text-muted-foreground">{t.categories[c].tagline}</p>
+              <h3 className="relative mt-2 font-display text-2xl leading-tight">{cat.name[lang]}</h3>
+              <p className="relative mt-1 text-sm text-muted-foreground">{cat.tagline[lang]}</p>
               <div className="relative mt-auto flex items-end justify-between pt-4">
                 <img
-                  src={productImage(CATEGORY_COVER[c])}
+                  src={productImage(categoryCover(cat, products))}
                   alt=""
                   loading="lazy"
                   className="-mb-4 -ml-2 h-48 w-48 object-contain mix-blend-multiply transition-transform duration-700 ease-out group-hover:-translate-y-2 group-hover:rotate-[-3deg] group-hover:scale-105"

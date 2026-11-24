@@ -1,26 +1,26 @@
-import { useState } from "react";
-import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { AnimatePresence, motion } from "motion/react";
 import { AlertTriangle, CalendarCheck, Check, ChevronRight, Clock, Info } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Disclaimer } from "@/components/products/Disclaimer";
 import { ProductCard } from "@/components/products/ProductCard";
+import { CatalogLoading, NotFound } from "@/components/site/NotFound";
 import { Reveal } from "@/components/site/Reveal";
 import { WhatsAppIcon } from "@/components/site/WhatsAppIcon";
 import { productImage } from "@/data/images";
-import { displayName, getProduct, products } from "@/data/products";
+import { getProduct } from "@/data/products";
+import { displayName, formatPrice, useCatalog, type CatalogProduct } from "@/data/store";
 import { en } from "@/i18n/en";
 import { fill, useI18n } from "@/i18n";
 import { whatsappLink } from "@/lib/contact";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/product/$slug")({
-  loader: ({ params }) => {
-    const product = getProduct(params.slug);
-    if (!product) throw notFound();
-    return { slug: product.slug };
-  },
+  // Products added in the dashboard are not in the bundled data, so an unknown slug is
+  // resolved in the page once the live catalogue has loaded.
+  loader: ({ params }) => ({ slug: params.slug }),
   head: ({ loaderData }) => {
     const p = loaderData ? getProduct(loaderData.slug) : undefined;
     if (!p) {
@@ -43,14 +43,26 @@ export const Route = createFileRoute("/product/$slug")({
 
 function ProductPage() {
   const { slug } = Route.useLoaderData();
-  const product = getProduct(slug)!;
+  const { getProduct: findProduct, pending } = useCatalog();
+  const product = findProduct(slug);
+  if (!product) return pending ? <CatalogLoading /> : <NotFound />;
+  return <ProductDetails key={product.slug} product={product} />;
+}
+
+function ProductDetails({ product }: { product: CatalogProduct }) {
   const { t, lang } = useI18n();
+  const { products, getCategory } = useCatalog();
   const [active, setActive] = useState(0);
   const [zoom, setZoom] = useState<{ x: number; y: number } | null>(null);
   const name = displayName(product, lang);
   const related = products.filter((p) => p.category === product.category && p.slug !== product.slug).slice(0, 4);
-  const categoryName = t.categories[product.category].name;
-  const activeKey = product.images[active] ?? product.images[0]!;
+  const categoryName = getCategory(product.category)?.name[lang] ?? "";
+  const activeKey = product.images[active] ?? product.images[0] ?? "";
+  const soldOut = product.inStock === false;
+
+  useEffect(() => {
+    document.title = `${product.name}${product.brand ? ` by ${product.brand}` : ""} — Daryeel Wellness`;
+  }, [product.name, product.brand]);
 
   return (
     <>
@@ -142,6 +154,16 @@ function ProductPage() {
                 </p>
               )}
               {product.facts && <p className="mt-1 text-sm text-muted-foreground">{product.facts}</p>}
+              {(product.price != null || soldOut) && (
+                <div className="mt-5 flex flex-wrap items-center gap-3">
+                  {product.price != null && <p className="text-3xl font-bold text-primary">{formatPrice(product.price)}</p>}
+                  {soldOut && (
+                    <span className="rounded-full bg-foreground/85 px-3 py-1 text-xs font-bold uppercase tracking-wider text-background">
+                      {t.common.outOfStock}
+                    </span>
+                  )}
+                </div>
+              )}
 
               <h2 className="mt-8 font-sans text-xs font-bold uppercase tracking-[0.16em] text-muted-foreground">{t.common.productDetails}</h2>
               <p className="mt-2 text-lg leading-relaxed text-foreground/85">{product.description[lang]}</p>

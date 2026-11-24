@@ -2,7 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { Mail, MapPin, Phone } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { CATEGORY_IDS } from "@/data/catalog";
+import { useCatalog } from "@/data/store";
 import { useI18n } from "@/i18n";
 import { CONTACT, telHref, whatsappLink } from "@/lib/contact";
 import { LanguageSwitcher } from "./LanguageSwitcher";
@@ -12,7 +12,8 @@ import { NAV_LINKS } from "./nav-links";
 import { WhatsAppIcon } from "./WhatsAppIcon";
 
 export function Footer() {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
+  const { categories } = useCatalog();
   return (
     <footer className="relative overflow-hidden bg-forest-gradient text-forest-foreground">
       <div className="leaf-pattern absolute inset-0 opacity-40" />
@@ -51,7 +52,7 @@ export function Footer() {
           <nav className="lg:col-span-2" aria-label={t.footer.categories}>
             <h3 className="mb-4 font-sans text-xs font-bold uppercase tracking-[0.16em] text-lime">{t.footer.categories}</h3>
             <ul className="space-y-2.5 text-sm">
-              {CATEGORY_IDS.map((c) => (
+              {categories.map(({ slug: c, name }) => (
                 <li key={c}>
                   <Link
                     to="/products/$category"
@@ -59,7 +60,7 @@ export function Footer() {
                     search={{}}
                     className="text-forest-muted transition-colors hover:text-lime"
                   >
-                    {t.categories[c].name}
+                    {name[lang]}
                   </Link>
                 </li>
               ))}

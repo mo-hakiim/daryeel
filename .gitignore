@@ -34,3 +34,8 @@ dist-ssr
 # Local tooling
 .claude/
 package-lock.json
+
+# Local secrets
+.env
+.env.*
+!.env.example

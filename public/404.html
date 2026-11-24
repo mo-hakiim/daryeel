@@ -32,6 +32,15 @@
     <script>
       // On github.io project sites the site lives under /<repo>/; on a custom domain it is at /.
       var base = location.hostname.slice(-10) === ".github.io" ? "/" + location.pathname.split("/")[1] + "/" : "/";
+      // Products and categories added in the dashboard after the last build have no static
+      // page yet: hand the path to the app, which opens it once the live catalogue loads.
+      var rest = location.pathname.slice(base.length - 1);
+      if (/^\/(product|products|admin)\/[^/]/.test(rest)) {
+        try {
+          sessionStorage.setItem("dw_redirect", rest + location.search + location.hash);
+          location.replace(base);
+        } catch (e) {}
+      }
       document.getElementById("home").href = base;
       document.getElementById("logo").src = base + "favicon.png";
       var icon = document.createElement("link");

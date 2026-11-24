@@ -45,6 +45,8 @@ export const en = {
     emailUs: "Email us",
     productsCount: "{n} products",
     productCount: "{n} product",
+    outOfStock: "Out of stock",
+    loadingProducts: "Loading products…",
   },
   hero: {
     eyebrow: "Natural Health · Wellness · Consultation",

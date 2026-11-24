@@ -1,11 +1,11 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
   Outlet,
-  Link,
   createRootRouteWithContext,
   useRouter,
   HeadContent,
   Scripts,
+  useMatch,
   type ErrorComponentProps,
 } from "@tanstack/react-router";
 import { MotionConfig } from "motion/react";
@@ -16,26 +16,14 @@ import { reportLovableError } from "../lib/lovable-error-reporting";
 import { Button } from "@/components/ui/button";
 import { Floaters } from "@/components/site/Floaters";
 import { Footer } from "@/components/site/Footer";
-import { Leaf } from "@/components/site/Leaf";
 import { Navbar } from "@/components/site/Navbar";
+import { NotFound } from "@/components/site/NotFound";
 import { Preloader } from "@/components/site/Preloader";
-import { LanguageProvider, readSavedLang, useI18n } from "@/i18n";
+import { CatalogProvider } from "@/data/store";
+import { LanguageProvider, readSavedLang } from "@/i18n";
 
 function NotFoundComponent() {
-  const { t } = useI18n();
-  return (
-    <section className="relative flex min-h-[80vh] items-center justify-center overflow-hidden bg-hero px-4 pt-24">
-      <Leaf className="absolute left-1/2 top-1/2 h-[28rem] w-72 -translate-x-1/2 -translate-y-1/2 text-primary/10" />
-      <div className="relative max-w-md text-center">
-        <p className="font-display text-8xl italic text-primary">404</p>
-        <h1 className="mt-4 text-3xl font-medium">{t.notFound.title}</h1>
-        <p className="mt-3 text-muted-foreground">{t.notFound.text}</p>
-        <Button asChild variant="forest" size="lg" className="mt-8">
-          <Link to="/">{t.notFound.home}</Link>
-        </Button>
-      </div>
-    </section>
-  );
+  return <NotFound />;
 }
 
 function ErrorComponent({ error, reset }: ErrorComponentProps) {
@@ -126,21 +114,51 @@ function RootShell({ children }: { children: ReactNode }) {
   );
 }
 
+/**
+ * GitHub Pages has no page for products/categories added after the last build, so
+ * public/404.html stores the requested path and sends the visitor to the home page;
+ * this picks it up and opens the right page.
+ */
+function useDeepLinkRedirect() {
+  const router = useRouter();
+  useEffect(() => {
+    let target: string | null = null;
+    try {
+      target = sessionStorage.getItem("dw_redirect");
+      sessionStorage.removeItem("dw_redirect");
+    } catch {
+      return;
+    }
+    if (!target || !target.startsWith("/") || target.startsWith("//")) return;
+    router.history.replace(import.meta.env.BASE_URL.replace(/\/$/, "") + target);
+  }, [router]);
+}
+
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const isAdmin = Boolean(useMatch({ from: "/admin", shouldThrow: false }));
+  useDeepLinkRedirect();
 
   return (
     <QueryClientProvider client={queryClient}>
-      <MotionConfig reducedMotion="user">
-        <Preloader />
-        <Navbar />
-        <main id="main">
-          {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-          <Outlet />
-        </main>
-        <Footer />
-        <Floaters />
-      </MotionConfig>
+      <CatalogProvider>
+        <MotionConfig reducedMotion="user">
+          {isAdmin ? (
+            <Outlet />
+          ) : (
+            <>
+              <Preloader />
+              <Navbar />
+              <main id="main">
+                {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+                <Outlet />
+              </main>
+              <Footer />
+              <Floaters />
+            </>
+          )}
+        </MotionConfig>
+      </CatalogProvider>
     </QueryClientProvider>
   );
 }

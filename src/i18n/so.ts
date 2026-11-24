@@ -46,6 +46,8 @@ export const so: Dictionary = {
     emailUs: "Noo soo dir iimayl",
     productsCount: "{n} alaabood",
     productCount: "{n} alaab",
+    outOfStock: "Waa laga dhammaaday",
+    loadingProducts: "Alaabta waa la soo rarayaa…",
   },
   hero: {
     eyebrow: "Caafimaad Dabiici ah · Fayo-qab · La-talin",

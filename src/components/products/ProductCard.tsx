@@ -6,7 +6,8 @@ import { ArrowUpRight, Check, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { WhatsAppIcon } from "@/components/site/WhatsAppIcon";
 import { productImage } from "@/data/images";
-import { displayName, type Product } from "@/data/products";
+import { displayName, formatPrice, useCatalog, type CatalogProduct } from "@/data/store";
+import { cn } from "@/lib/utils";
 import { fill, useI18n } from "@/i18n";
 import { whatsappLink } from "@/lib/contact";
 
@@ -14,8 +15,10 @@ export function orderMessage(template: string, productName: string) {
   return fill(template, { product: productName });
 }
 
-export function ProductCard({ product }: { product: Product }) {
+export function ProductCard({ product }: { product: CatalogProduct }) {
   const { t, lang } = useI18n();
+  const { getCategory } = useCatalog();
+  const soldOut = product.inStock === false;
   const name = displayName(product, lang);
   const ref = useRef<HTMLDivElement>(null);
   const mx = useMotionValue(0);
@@ -34,7 +37,7 @@ export function ProductCard({ product }: { product: Product }) {
     my.set(0);
   };
 
-  const categoryLabel = product.subcategory ? t.subcategories[product.subcategory] : t.categories[product.category].name;
+  const categoryLabel = product.subcategory ? t.subcategories[product.subcategory] : (getCategory(product.category)?.name[lang] ?? "");
 
   return (
     <div className="perspective h-full">
@@ -52,14 +55,22 @@ export function ProductCard({ product }: { product: Product }) {
           aria-label={`${t.common.viewDetails}: ${name}`}
         >
           <img
-            src={productImage(product.images[0]!)}
+            src={productImage(product.images[0] ?? "")}
             alt={name}
             loading="lazy"
             decoding="async"
             width={900}
             height={900}
-            className="h-full w-full object-contain p-5 mix-blend-multiply transition-transform duration-700 ease-out group-hover:scale-[1.07]"
+            className={cn(
+              "h-full w-full object-contain p-5 mix-blend-multiply transition-transform duration-700 ease-out group-hover:scale-[1.07]",
+              soldOut && "opacity-60 grayscale-[40%]",
+            )}
           />
+          {soldOut && (
+            <span className="absolute bottom-3 left-3 rounded-full bg-foreground/85 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-background">
+              {t.common.outOfStock}
+            </span>
+          )}
           <span className="glass absolute left-3 top-3 rounded-full px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-primary">
             {categoryLabel}
           </span>
@@ -79,6 +90,7 @@ export function ProductCard({ product }: { product: Product }) {
               {name}
             </Link>
           </h3>
+          {product.price != null && <p className="mt-1 text-lg font-bold text-primary">{formatPrice(product.price)}</p>}
           <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-muted-foreground">{product.description[lang]}</p>
 
           <div className="mt-4 flex-1">

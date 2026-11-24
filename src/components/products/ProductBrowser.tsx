@@ -2,13 +2,13 @@ import { useMemo } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { Search, X } from "lucide-react";
 
-import { CATEGORY_IDS, CATEGORY_SUBCATEGORIES, type CategoryId, type SubcategoryId } from "@/data/catalog";
-import { products, searchProducts } from "@/data/products";
+import type { SubcategoryId } from "@/data/catalog";
+import { searchProducts, subcategoriesOf, useCatalog } from "@/data/store";
 import { fill, useI18n } from "@/i18n";
 import { cn } from "@/lib/utils";
 import { ProductCard } from "./ProductCard";
 
-export type BrowserState = { category?: CategoryId | undefined; sub?: SubcategoryId | undefined; q?: string | undefined };
+export type BrowserState = { category?: string | undefined; sub?: SubcategoryId | undefined; q?: string | undefined };
 
 /** Search + category/subcategory filters + animated product grid. */
 export function ProductBrowser({
@@ -20,7 +20,8 @@ export function ProductBrowser({
   onChange: (next: BrowserState) => void;
   lockCategory?: boolean;
 }) {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
+  const { products, categories, pending } = useCatalog();
   const { category, sub, q = "" } = state;
 
   const filtered = useMemo(() => {
@@ -28,9 +29,9 @@ export function ProductBrowser({
     if (category) list = list.filter((p) => p.category === category);
     if (category && sub) list = list.filter((p) => p.subcategory === sub);
     return searchProducts(list, q);
-  }, [category, sub, q]);
+  }, [products, category, sub, q]);
 
-  const subs = category ? CATEGORY_SUBCATEGORIES[category] : [];
+  const subs = subcategoriesOf(category);
   const countLabel = fill(filtered.length === 1 ? t.common.productCount : t.common.productsCount, { n: filtered.length });
   const hasFilters = Boolean(q || sub || (!lockCategory && category));
 
@@ -54,9 +55,9 @@ export function ProductBrowser({
             <FilterChip active={!category} onClick={() => onChange({ q: state.q })}>
               {t.catalog.all}
             </FilterChip>
-            {CATEGORY_IDS.map((c) => (
+            {categories.map(({ slug: c, name }) => (
               <FilterChip key={c} active={category === c} onClick={() => onChange({ q: state.q, category: c })}>
-                {t.categories[c].name}
+                {name[lang]}
               </FilterChip>
             ))}
           </div>
@@ -92,7 +93,9 @@ export function ProductBrowser({
       </div>
 
       {filtered.length === 0 ? (
-        <p className="rounded-3xl border border-dashed p-12 text-center text-muted-foreground">{t.catalog.noResults}</p>
+        <p className="rounded-3xl border border-dashed p-12 text-center text-muted-foreground">
+          {pending ? t.common.loadingProducts : t.catalog.noResults}
+        </p>
       ) : (
         <motion.ul layout className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           <AnimatePresence mode="popLayout">

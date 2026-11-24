@@ -1,8 +1,9 @@
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
-import { products } from "@/data/products";
+import { useCatalog } from "@/data/store";
 import { ProductCard } from "./ProductCard";
 
 export function FeaturedCarousel() {
+  const { products } = useCatalog();
   const featured = products.filter((p) => p.featured);
   return (
     <Carousel opts={{ align: "start", loop: true }} className="relative">

@@ -27,6 +27,12 @@ const pages = [
   "/products",
   ...CATEGORY_IDS.map((id) => `/products/${id}`),
   ...products.map((p) => `/product/${p.slug}`),
+  // Admin dashboard (not linked from the site; noindex). Rendered as an empty shell,
+  // the sign-in check runs in the browser.
+  "/admin",
+  "/admin/login",
+  "/admin/product",
+  "/admin/categories",
 ].map((path) => ({ path }));
 
 export default defineConfig({

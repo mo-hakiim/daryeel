@@ -6,15 +6,15 @@ import { Button } from "@/components/ui/button";
 import { Leaf } from "@/components/site/Leaf";
 import { Reveal } from "@/components/site/Reveal";
 import { SectionHeading } from "@/components/site/SectionHeading";
-import { CATEGORY_IDS } from "@/data/catalog";
-import { products } from "@/data/products";
+import { useCatalog } from "@/data/store";
 import { useI18n } from "@/i18n";
 
 export function AboutIntro({ withLink = false }: { withLink?: boolean }) {
   const { t } = useI18n();
+  const { categories, products } = useCatalog();
   const stats = [
     { value: t.about.foundedValue, label: t.about.founded },
-    { value: String(CATEGORY_IDS.length), label: t.about.categoriesStat },
+    { value: String(categories.length), label: t.about.categoriesStat },
     { value: `${products.length}+`, label: t.about.productsStat },
   ];
   return (

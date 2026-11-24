@@ -5,15 +5,15 @@ import { Disclaimer } from "@/components/products/Disclaimer";
 import { ProductBrowser, type BrowserState } from "@/components/products/ProductBrowser";
 import { PageHeader } from "@/components/site/PageHeader";
 import { SectionHeading } from "@/components/site/SectionHeading";
-import { isCategoryId, isSubcategoryId, type CategoryId, type SubcategoryId } from "@/data/catalog";
+import { isSubcategoryId, type SubcategoryId } from "@/data/catalog";
 import { useI18n } from "@/i18n";
 
-type Search = { category?: CategoryId; sub?: SubcategoryId; q?: string };
+type Search = { category?: string; sub?: SubcategoryId; q?: string };
 
 export const Route = createFileRoute("/products/")({
   validateSearch: (s: Record<string, unknown>): Search => {
     const out: Search = {};
-    if (typeof s["category"] === "string" && isCategoryId(s["category"])) out.category = s["category"];
+    if (typeof s["category"] === "string" && /^[a-z0-9-]{1,60}$/.test(s["category"])) out.category = s["category"];
     if (typeof s["sub"] === "string" && isSubcategoryId(s["sub"])) out.sub = s["sub"];
     if (typeof s["q"] === "string" && s["q"]) out.q = s["q"].slice(0, 80);
     return out;
