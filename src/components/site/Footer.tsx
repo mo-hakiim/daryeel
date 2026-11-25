@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Mail, MapPin, Phone } from "lucide-react";
+import { Lock, Mail, MapPin, Phone } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { useCatalog } from "@/data/store";
@@ -98,10 +98,14 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="flex flex-wrap items-center gap-x-2 gap-y-1 border-t border-forest-foreground/10 py-6 text-xs text-forest-muted">
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-3 border-t border-forest-foreground/10 py-6 text-xs text-forest-muted">
           <p>{t.footer.rights}</p>
-          <span aria-hidden="true">·</span>
-          <Link to="/admin" rel="nofollow" className="text-forest-muted/80 transition-colors hover:text-lime">
+          <Link
+            to="/admin"
+            rel="nofollow"
+            className="inline-flex items-center gap-1.5 rounded-full border border-lime/50 bg-lime/10 px-4 py-2 text-sm font-semibold text-lime transition-colors hover:bg-lime hover:text-lime-foreground"
+          >
+            <Lock className="size-4" />
             {t.footer.admin}
           </Link>
         </div>
