@@ -39,7 +39,7 @@ jobs:
       - run: bun run build
         env:
           # Project site URL. For a custom domain change this to "/".
-          BASE_PATH: /daryeel/
+          BASE_PATH: /
           # Public Supabase settings (Settings → Secrets and variables → Actions,
           # as repository secrets or repository variables).
           # Only the anon key — never the service_role key.
