@@ -20,6 +20,7 @@ import { Navbar } from "@/components/site/Navbar";
 import { NotFound } from "@/components/site/NotFound";
 import { Preloader } from "@/components/site/Preloader";
 import { CatalogProvider } from "@/data/store";
+import { initialUrlHash } from "@/lib/supabase";
 import { LanguageProvider, readSavedLang } from "@/i18n";
 
 function NotFoundComponent() {
@@ -36,7 +37,9 @@ function ErrorComponent({ error, reset }: ErrorComponentProps) {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="max-w-md text-center">
-        <h1 className="text-xl font-semibold tracking-tight text-foreground">This page didn't load</h1>
+        <h1 className="text-xl font-semibold tracking-tight text-foreground">
+          This page didn't load
+        </h1>
         <p className="mt-2 text-sm text-muted-foreground">
           Something went wrong on our end. You can try refreshing or head back home.
         </p>
@@ -73,10 +76,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "author", content: "Daryeel Wellness" },
       { name: "theme-color", content: "#2e700a" },
       { property: "og:site_name", content: "Daryeel Wellness" },
-      { property: "og:title", content: "Daryeel Wellness — Natural Health, Wellness & Consultation" },
+      {
+        property: "og:title",
+        content: "Daryeel Wellness — Natural Health, Wellness & Consultation",
+      },
       {
         property: "og:description",
-        content: "Herbal products, dietary supplements, sports nutrition, vitamins and natural wellness consultations in Hargeisa.",
+        content:
+          "Herbal products, dietary supplements, sports nutrition, vitamins and natural wellness consultations in Hargeisa.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -122,6 +129,16 @@ function RootShell({ children }: { children: ReactNode }) {
 function useDeepLinkRedirect() {
   const router = useRouter();
   useEffect(() => {
+    // A password-reset email link that landed on another page (Supabase falls back to the
+    // Site URL when the reset address isn't on its allow-list): forward it, tokens included.
+    const hash = window.location.hash || initialUrlHash;
+    if (
+      /type=recovery|error_code=/.test(hash) &&
+      !/\/admin\/reset-password\/?$/.test(window.location.pathname)
+    ) {
+      window.location.replace(`${import.meta.env.BASE_URL}admin/reset-password${hash}`);
+      return;
+    }
     let target: string | null = null;
     try {
       target = sessionStorage.getItem("dw_redirect");
