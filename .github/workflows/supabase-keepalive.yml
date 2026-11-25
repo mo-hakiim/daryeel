@@ -16,11 +16,11 @@ jobs:
     steps:
       - name: Ping Supabase REST API
         env:
-          SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
-          SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+          SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL || vars.VITE_SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY || vars.VITE_SUPABASE_ANON_KEY }}
         run: |
           if [ -z "$SUPABASE_URL" ] || [ -z "$SUPABASE_ANON_KEY" ]; then
-            echo "::error::Add the VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY repository secrets."
+            echo "::error::Add the VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY repository secrets or variables."
             exit 1
           fi
           status=$(curl -sS -o /dev/null -w "%{http_code}" \

@@ -21,14 +21,25 @@ jobs:
       - uses: actions/checkout@v4
       - uses: oven-sh/setup-bun@v2
       - run: bun install --frozen-lockfile
+      - name: Check Supabase settings
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL || vars.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY || vars.VITE_SUPABASE_ANON_KEY }}
+        run: |
+          if [ -z "$VITE_SUPABASE_URL" ] || [ -z "$VITE_SUPABASE_ANON_KEY" ]; then
+            echo "::warning::VITE_SUPABASE_URL / VITE_SUPABASE_ANON_KEY are not set as repository secrets or variables. The site will use the bundled products and /admin will be disconnected."
+          else
+            echo "Supabase settings found (URL: $VITE_SUPABASE_URL)."
+          fi
       - run: bun run build
         env:
           # Project site URL. For a custom domain change this to "/".
           BASE_PATH: /daryeel/
-          # Public Supabase settings (Settings → Secrets and variables → Actions).
+          # Public Supabase settings (Settings → Secrets and variables → Actions,
+          # as repository secrets or repository variables).
           # Only the anon key — never the service_role key.
-          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
-          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL || vars.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY || vars.VITE_SUPABASE_ANON_KEY }}
       - uses: actions/upload-pages-artifact@v3
         with:
           path: .output/public
