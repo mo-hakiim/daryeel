@@ -33,6 +33,7 @@ const pages = [
   "/admin/login",
   "/admin/product",
   "/admin/categories",
+  "/admin/reset-password",
 ].map((path) => ({ path }));
 
 export default defineConfig({

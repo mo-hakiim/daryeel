@@ -98,8 +98,12 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="border-t border-forest-foreground/10 py-6 text-xs text-forest-muted">
+        <div className="flex flex-wrap items-center gap-x-2 gap-y-1 border-t border-forest-foreground/10 py-6 text-xs text-forest-muted">
           <p>{t.footer.rights}</p>
+          <span aria-hidden="true">·</span>
+          <Link to="/admin" rel="nofollow" className="text-forest-muted/80 transition-colors hover:text-lime">
+            {t.footer.admin}
+          </Link>
         </div>
       </div>
     </footer>

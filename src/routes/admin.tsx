@@ -1,14 +1,24 @@
 import { useState, type FormEvent } from "react";
-import { createFileRoute, Outlet } from "@tanstack/react-router";
-import { Lock, ShieldAlert } from "lucide-react";
+import { createFileRoute, Outlet, useMatch } from "@tanstack/react-router";
+import { ArrowLeft, Lock, Mail, RefreshCw, ShieldAlert, WifiOff } from "lucide-react";
 
 import { AdminAuthProvider, useAdminAuth } from "@/admin/auth";
-import { AdminHeader, Field, Spinner, errorMessage, inputClass } from "@/admin/ui";
+import {
+  AdminHeader,
+  Card,
+  Centered,
+  ErrorBox,
+  Field,
+  Spinner,
+  authMessage,
+  inputClass,
+} from "@/admin/ui";
 import { Logo } from "@/components/site/Logo";
 import { Button } from "@/components/ui/button";
 import { Toaster } from "@/components/ui/sonner";
+import { requestPasswordReset } from "@/lib/supabase";
 
-// The dashboard is not linked from the site and is kept out of search engines.
+// The dashboard is reached from a small footer link and is kept out of search engines.
 export const Route = createFileRoute("/admin")({
   head: () => ({
     meta: [{ title: "Admin — Daryeel Wellness" }, { name: "robots", content: "noindex, nofollow" }],
@@ -28,7 +38,10 @@ function AdminLayout() {
 }
 
 function Gate() {
-  const { status, email, signOut } = useAdminAuth();
+  const { status, email, signOut, retry } = useAdminAuth();
+  // The password-reset page (opened from the email link) must work while signed out.
+  const isReset = Boolean(useMatch({ from: "/admin/reset-password", shouldThrow: false }));
+  if (isReset) return <Outlet />;
 
   if (status === "checking") {
     return (
@@ -44,9 +57,28 @@ function Gate() {
           <ShieldAlert className="mx-auto size-8 text-primary" />
           <h1 className="mt-3 text-center text-2xl font-medium">Dashboard not connected</h1>
           <p className="mt-2 text-center text-sm text-muted-foreground">
-            This build has no Supabase settings. Add <code>VITE_SUPABASE_URL</code> and{" "}
-            <code>VITE_SUPABASE_ANON_KEY</code> (GitHub secrets or <code>.env</code>) and rebuild.
+            This version of the website isn't connected to the shop database, so you can't sign in
+            here. The site manager needs to add the Supabase settings (
+            <code>VITE_SUPABASE_URL</code> and <code>VITE_SUPABASE_ANON_KEY</code>) and rebuild the
+            site.
           </p>
+        </Card>
+      </Centered>
+    );
+  }
+  if (status === "unreachable") {
+    return (
+      <Centered>
+        <Card>
+          <WifiOff className="mx-auto size-8 text-primary" />
+          <h1 className="mt-3 text-center text-2xl font-medium">Can't reach the database</h1>
+          <p className="mt-2 text-center text-sm text-muted-foreground">
+            The dashboard couldn't connect to the shop database. Check your internet connection and
+            try again in a moment.
+          </p>
+          <Button className="mt-6 w-full" variant="forest" onClick={retry}>
+            <RefreshCw /> Try again
+          </Button>
         </Card>
       </Centered>
     );
@@ -57,9 +89,11 @@ function Gate() {
       <Centered>
         <Card>
           <ShieldAlert className="mx-auto size-8 text-destructive" />
-          <h1 className="mt-3 text-center text-2xl font-medium">No access</h1>
+          <h1 className="mt-3 text-center text-2xl font-medium">Not an admin</h1>
           <p className="mt-2 text-center text-sm text-muted-foreground">
-            {email} is signed in but is not an admin of this shop.
+            The password is correct, but <strong className="text-foreground">{email}</strong> isn't
+            on the shop's admin list, so it can't manage products. Ask the site manager to add this
+            account as an admin in Supabase, or sign out and use the owner's account.
           </p>
           <Button className="mt-6 w-full" variant="outline" onClick={() => void signOut()}>
             Sign out
@@ -79,6 +113,23 @@ function Gate() {
 }
 
 function LoginForm() {
+  const [mode, setMode] = useState<"signin" | "forgot">("signin");
+  return (
+    <Centered>
+      <Card>
+        <Logo className="mx-auto h-10" />
+        {mode === "signin" ? (
+          <SignInForm onForgot={() => setMode("forgot")} />
+        ) : (
+          <ForgotForm onBack={() => setMode("signin")} />
+        )}
+      </Card>
+    </Centered>
+  );
+}
+
+// Accounts are created only in Supabase — there is deliberately no sign-up here.
+function SignInForm({ onForgot }: { onForgot: () => void }) {
   const { signIn } = useAdminAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -92,32 +143,28 @@ function LoginForm() {
     try {
       await signIn(email.trim(), password);
     } catch (err) {
-      const msg = errorMessage(err);
-      setError(/invalid/i.test(msg) ? "Wrong email or password." : msg);
+      setError(authMessage(err));
     } finally {
       setBusy(false);
     }
   };
 
   return (
-    <Centered>
-      <Card>
-        <Logo className="mx-auto h-10" />
-        <h1 className="mt-6 text-center text-2xl font-medium">Shop dashboard</h1>
-        <p className="mt-1 text-center text-sm text-muted-foreground">
-          Sign in to manage products.
-        </p>
-        <form onSubmit={submit} className="mt-6 space-y-4">
-          <Field label="Email">
-            <input
-              type="email"
-              required
-              autoComplete="username"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className={inputClass}
-            />
-          </Field>
+    <>
+      <h1 className="mt-6 text-center text-2xl font-medium">Shop dashboard</h1>
+      <p className="mt-1 text-center text-sm text-muted-foreground">Sign in to manage products.</p>
+      <form onSubmit={submit} className="mt-6 space-y-4">
+        <Field label="Email">
+          <input
+            type="email"
+            required
+            autoComplete="username"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className={inputClass}
+          />
+        </Field>
+        <div>
           <Field label="Password">
             <input
               type="password"
@@ -128,36 +175,98 @@ function LoginForm() {
               className={inputClass}
             />
           </Field>
-          {error && (
-            <p
-              role="alert"
-              className="rounded-xl bg-destructive/10 px-3 py-2 text-sm text-destructive"
-            >
-              {error}
-            </p>
+          <button
+            type="button"
+            onClick={onForgot}
+            className="mt-2 text-sm font-semibold text-primary hover:underline"
+          >
+            Forgot password?
+          </button>
+        </div>
+        <ErrorBox message={error} />
+        <Button type="submit" variant="forest" size="lg" className="w-full" disabled={busy}>
+          {busy ? (
+            <Spinner className="border-forest-foreground/30 border-t-forest-foreground" />
+          ) : (
+            <Lock />
           )}
-          <Button type="submit" variant="forest" size="lg" className="w-full" disabled={busy}>
-            {busy ? (
-              <Spinner className="border-forest-foreground/30 border-t-forest-foreground" />
-            ) : (
-              <Lock />
-            )}
-            Sign in
-          </Button>
-        </form>
-      </Card>
-    </Centered>
+          Sign in
+        </Button>
+      </form>
+    </>
   );
 }
 
-function Centered({ children }: { children: React.ReactNode }) {
-  return <div className="flex min-h-screen items-center justify-center px-4 py-10">{children}</div>;
-}
+function ForgotForm({ onBack }: { onBack: () => void }) {
+  const [email, setEmail] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [sent, setSent] = useState(false);
+  const [error, setError] = useState("");
 
-function Card({ children }: { children: React.ReactNode }) {
+  const submit = async (e: FormEvent) => {
+    e.preventDefault();
+    setBusy(true);
+    setError("");
+    try {
+      await requestPasswordReset(email.trim());
+      setSent(true);
+    } catch (err) {
+      setError(authMessage(err));
+    } finally {
+      setBusy(false);
+    }
+  };
+
   return (
-    <div className="w-full max-w-sm rounded-3xl border bg-card p-6 shadow-lift sm:p-8">
-      {children}
-    </div>
+    <>
+      <h1 className="mt-6 text-center text-2xl font-medium">Reset your password</h1>
+      {sent ? (
+        <div className="mt-4 space-y-4 text-center">
+          <Mail className="mx-auto size-10 text-primary" />
+          <p className="text-sm text-muted-foreground">
+            If <strong className="text-foreground">{email}</strong> belongs to a shop account, a
+            reset link is on its way. Open the email and tap the link to choose a new password.
+            Check your spam folder if it doesn't arrive within a few minutes.
+          </p>
+          <Button variant="outline" className="w-full" onClick={onBack}>
+            <ArrowLeft /> Back to sign in
+          </Button>
+        </div>
+      ) : (
+        <>
+          <p className="mt-1 text-center text-sm text-muted-foreground">
+            Enter the account's email and we'll send a link to set a new password.
+          </p>
+          <form onSubmit={submit} className="mt-6 space-y-4">
+            <Field label="Email">
+              <input
+                type="email"
+                required
+                autoComplete="username"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className={inputClass}
+              />
+            </Field>
+            <ErrorBox message={error} />
+            <Button type="submit" variant="forest" size="lg" className="w-full" disabled={busy}>
+              {busy ? (
+                <Spinner className="border-forest-foreground/30 border-t-forest-foreground" />
+              ) : (
+                <Mail />
+              )}
+              Send reset link
+            </Button>
+            <button
+              type="button"
+              onClick={onBack}
+              className="mx-auto flex items-center gap-1 text-sm font-semibold text-muted-foreground hover:text-primary"
+            >
+              <ArrowLeft className="size-4" /> Back to sign in
+            </button>
+          </form>
+        </>
+      )}
+    </>
   );
 }

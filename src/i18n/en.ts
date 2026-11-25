@@ -282,6 +282,7 @@ export const en = {
     categories: "Product Categories",
     contact: "Contact",
     rights: "© 2026 Daryeel Wellness. All Rights Reserved.",
+    admin: "Admin",
     chatCta: "Questions? Chat with us on WhatsApp",
   },
   notFound: {

@@ -1,7 +1,7 @@
 // Shared building blocks for the admin dashboard. The dashboard is for the shop
 // owner only, so its copy is English and lives here rather than in src/i18n.
 import { Link } from "@tanstack/react-router";
-import { ExternalLink, LogOut, Package, Tags } from "lucide-react";
+import { ExternalLink, Package, Tags } from "lucide-react";
 import type { ReactNode } from "react";
 
 import {
@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Logo } from "@/components/site/Logo";
 import { cn } from "@/lib/utils";
-import { useAdminAuth } from "./auth";
+import { AccountMenu } from "./account";
 
 export const inputClass =
   "h-11 w-full rounded-xl border border-input bg-card px-3.5 text-base outline-none transition focus:border-primary focus:ring-2 focus:ring-ring/30 sm:text-sm";
@@ -25,7 +25,6 @@ export const textareaClass =
   "min-h-24 w-full rounded-xl border border-input bg-card px-3.5 py-2.5 text-base outline-none transition focus:border-primary focus:ring-2 focus:ring-ring/30 sm:text-sm";
 
 export function AdminHeader() {
-  const { email, signOut } = useAdminAuth();
   const nav =
     "inline-flex items-center gap-1.5 rounded-full px-3 py-2 text-sm font-semibold transition-colors hover:bg-secondary";
   const active = "bg-secondary text-primary";
@@ -60,16 +59,7 @@ export function AdminHeader() {
           </a>
         </nav>
         <div className="ml-auto flex items-center gap-2">
-          <span className="hidden max-w-44 truncate text-xs text-muted-foreground md:inline">
-            {email}
-          </span>
-          <button
-            type="button"
-            onClick={() => void signOut()}
-            className={cn(nav, "text-muted-foreground")}
-          >
-            <LogOut className="size-4" /> Sign out
-          </button>
+          <AccountMenu />
         </div>
       </div>
     </header>
@@ -202,4 +192,71 @@ export async function prepareImage(file: File): Promise<Blob> {
     /* fall through */
   }
   return file;
+}
+
+/**
+ * Plain-language message for sign-in and password errors from Supabase Auth.
+ * Falls back to errorMessage() for anything else.
+ */
+export function authMessage(e: unknown): string {
+  const status =
+    typeof e === "object" && e && "status" in e ? Number((e as { status: unknown }).status) : -1;
+  const code =
+    typeof e === "object" && e && "code" in e ? String((e as { code: unknown }).code) : "";
+  const text = `${code} ${e instanceof Error ? e.message : ""}`;
+  if (status === 0)
+    return "Can't reach the shop database right now. Check your internet connection and try again.";
+  if (/wrong_current_password/.test(text)) return "Your current password is not correct.";
+  if (/invalid_credentials|invalid login/i.test(text))
+    return "Wrong email or password. Check both and try again — passwords are case-sensitive.";
+  if (/email_not_confirmed|not confirmed/i.test(text))
+    return "This account's email hasn't been confirmed yet. Confirm the user in Supabase → Authentication → Users, then try again.";
+  if (/same_password|should be different/i.test(text))
+    return "The new password must be different from the current one.";
+  if (/weak_password|password should be|at least/i.test(text))
+    return "That password is too weak. Use at least 8 characters with letters and numbers.";
+  if (/otp_expired|expired|invalid.*link|access_denied/i.test(text))
+    return "This reset link has expired or was already used. Request a new one from the sign-in page.";
+  if (status === 429 || /rate_limit|too many/i.test(text))
+    return "Too many attempts. Please wait a few minutes and try again.";
+  if (/user_banned/.test(text)) return "This account has been disabled.";
+  return errorMessage(e);
+}
+
+export function PasswordRules() {
+  return (
+    <p className="text-xs text-muted-foreground">
+      At least 8 characters, with letters and numbers.
+    </p>
+  );
+}
+
+/** Returns a message if the new password isn't acceptable, otherwise null. */
+export function checkNewPassword(next: string, confirm: string): string | null {
+  if (next.length < 8) return "The new password must be at least 8 characters.";
+  if (!/[a-z]/i.test(next) || !/\d/.test(next))
+    return "Use both letters and numbers in the new password.";
+  if (next !== confirm) return "The two new passwords don't match.";
+  return null;
+}
+
+export function ErrorBox({ message }: { message: string }) {
+  if (!message) return null;
+  return (
+    <p role="alert" className="rounded-xl bg-destructive/10 px-3 py-2 text-sm text-destructive">
+      {message}
+    </p>
+  );
+}
+
+export function Centered({ children }: { children: ReactNode }) {
+  return <div className="flex min-h-screen items-center justify-center px-4 py-10">{children}</div>;
+}
+
+export function Card({ children }: { children: ReactNode }) {
+  return (
+    <div className="w-full max-w-sm rounded-3xl border bg-card p-6 shadow-lift sm:p-8">
+      {children}
+    </div>
+  );
 }

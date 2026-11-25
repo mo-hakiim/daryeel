@@ -283,6 +283,7 @@ export const so: Dictionary = {
     categories: "Qaybaha Alaabta",
     contact: "Xiriir",
     rights: "© 2026 Daryeel Wellness. Xuquuqda oo dhan way xifdisan tahay.",
+    admin: "Maamulka",
     chatCta: "Su'aalo ma qabtaa? Nagala hadal WhatsApp",
   },
   notFound: {

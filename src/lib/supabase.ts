@@ -59,7 +59,9 @@ async function request(path: string, init: RequestInit & { token?: string | unde
       const msg = String(
         b["message"] ?? b["error_description"] ?? b["msg"] ?? b["error"] ?? res.statusText,
       );
-      throw new SupabaseError(msg, res.status, b["code"] ? String(b["code"]) : undefined);
+      // Auth errors carry a machine-readable error_code (e.g. "invalid_credentials").
+      const code = b["error_code"] ?? b["code"];
+      throw new SupabaseError(msg, res.status, code != null ? String(code) : undefined);
     }
     return body;
   } catch (e) {
@@ -215,3 +217,66 @@ export async function isAdmin(session: Session) {
   );
   return rows.length > 0;
 }
+
+/* ---------------- Password reset & change ---------------- */
+
+/** Address the reset email links back to (must be allowed in Supabase → Auth → URL Configuration). */
+export function resetRedirectUrl() {
+  return `${window.location.origin}${import.meta.env.BASE_URL}admin/reset-password`;
+}
+
+/** Sends the "reset your password" email. Succeeds even for unknown addresses (Supabase doesn't reveal them). */
+export async function requestPasswordReset(email: string) {
+  await request(`/auth/v1/recover?redirect_to=${encodeURIComponent(resetRedirectUrl())}`, {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ email }),
+  });
+}
+
+/**
+ * Reads the tokens Supabase puts in the URL fragment after the email link
+ * (#access_token=…&refresh_token=…&type=recovery) and signs that user in.
+ * Throws a SupabaseError with the link's own error (e.g. otp_expired) if it failed.
+ */
+export async function sessionFromRecoveryLink(hash: string): Promise<Session | null> {
+  const p = new URLSearchParams(hash.replace(/^#/, ""));
+  if (p.get("error") || p.get("error_code")) {
+    throw new SupabaseError(
+      p.get("error_description")?.replace(/\+/g, " ") ?? "The reset link is not valid.",
+      400,
+      p.get("error_code") ?? p.get("error") ?? undefined,
+    );
+  }
+  const access = p.get("access_token");
+  const refresh = p.get("refresh_token");
+  if (!access || !refresh) return null;
+  const user = (await request("/auth/v1/user", { token: access })) as Session["user"];
+  const s: Session = {
+    access_token: access,
+    refresh_token: refresh,
+    expires_at: Number(
+      p.get("expires_at") ?? Math.floor(Date.now() / 1000) + Number(p.get("expires_in") ?? 3600),
+    ),
+    user,
+  };
+  saveSession(s);
+  return s;
+}
+
+/** Sets a new password for the signed-in user. */
+export async function updatePassword(token: string, password: string) {
+  await request("/auth/v1/user", {
+    method: "PUT",
+    token,
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ password }),
+  });
+}
+
+/**
+ * The URL fragment as it was when the app first loaded. Captured here (this module
+ * loads with the main bundle) before the router can normalise the URL, because the
+ * password-reset email link delivers its tokens in the fragment.
+ */
+export const initialUrlHash = typeof window !== "undefined" ? window.location.hash : "";
