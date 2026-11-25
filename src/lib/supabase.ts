@@ -6,7 +6,8 @@ const RAW_URL = (import.meta.env.VITE_SUPABASE_URL as string | undefined) ?? "";
 const ANON_KEY = (import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined) ?? "";
 
 export const SUPABASE_URL = RAW_URL.replace(/\/+$/, "");
-export const supabaseEnabled = Boolean(SUPABASE_URL && ANON_KEY);
+// A URL that is not http(s) (e.g. a key pasted into the URL setting) counts as not configured.
+export const supabaseEnabled = /^https?:\/\/[^/]+/.test(SUPABASE_URL) && Boolean(ANON_KEY);
 export const IMAGE_BUCKET = "product-images";
 
 const SESSION_KEY = "dw_admin_session";

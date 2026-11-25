@@ -28,6 +28,11 @@ jobs:
         run: |
           if [ -z "$VITE_SUPABASE_URL" ] || [ -z "$VITE_SUPABASE_ANON_KEY" ]; then
             echo "::warning::VITE_SUPABASE_URL / VITE_SUPABASE_ANON_KEY are not set as repository secrets or variables. The site will use the bundled products and /admin will be disconnected."
+          elif ! echo "$VITE_SUPABASE_URL" | grep -qE '^https://[a-z0-9-]+\.supabase\.co/?$'; then
+            echo "::warning::VITE_SUPABASE_URL should be the Project URL, like https://abcd1234.supabase.co (it is currently something else, maybe a key). The site will use the bundled products."
+          elif echo "$VITE_SUPABASE_ANON_KEY" | grep -qE '^sb_secret_|service_role'; then
+            echo "::error::VITE_SUPABASE_ANON_KEY is a SECRET key. Use the publishable (anon) key and rotate the secret one in Supabase."
+            exit 1
           else
             echo "Supabase settings found (URL: $VITE_SUPABASE_URL)."
           fi
