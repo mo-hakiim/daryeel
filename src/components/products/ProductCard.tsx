@@ -96,7 +96,9 @@ export function ProductCard({ product }: { product: CatalogProduct }) {
           <div className="mt-4 flex-1">
             {product.benefits ? (
               <>
-                <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.14em] text-primary">{t.common.keyBenefits}</p>
+                <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.14em] text-primary">
+                  {product.subcategory === "accessories" ? t.common.keyFeatures : t.common.keyBenefits}
+                </p>
                 <ul className="space-y-1.5">
                   {product.benefits.map((b) => (
                     <li key={b.en} className="flex gap-2 text-[13px] leading-snug text-foreground/85">

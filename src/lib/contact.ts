@@ -1,7 +1,7 @@
 // Official Daryeel Wellness contact details (from the company profile). Edit here only.
 export const CONTACT = {
-  whatsappDisplay: "+25263800227",
-  whatsappNumber: "25263800227",
+  whatsappDisplay: "+252638000227",
+  whatsappNumber: "252638000227",
   phones: ["0634029802", "0637999938"],
   email: "daryeelhargeisa07@gmail.com",
 } as const;

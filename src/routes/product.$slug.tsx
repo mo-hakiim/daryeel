@@ -171,7 +171,9 @@ function ProductDetails({ product }: { product: CatalogProduct }) {
               <div className="mt-8 rounded-3xl border bg-card p-6 shadow-soft">
                 {product.benefits ? (
                   <>
-                    <h2 className="font-sans text-xs font-bold uppercase tracking-[0.16em] text-primary">{t.common.keyBenefits}</h2>
+                    <h2 className="font-sans text-xs font-bold uppercase tracking-[0.16em] text-primary">
+                      {product.subcategory === "accessories" ? t.common.keyFeatures : t.common.keyBenefits}
+                    </h2>
                     <ul className="mt-4 space-y-3">
                       {product.benefits.map((b) => (
                         <li key={b.en} className="flex gap-3">

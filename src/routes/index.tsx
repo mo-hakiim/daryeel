@@ -28,7 +28,7 @@ export const Route = createFileRoute("/")({
       { property: "og:title", content: "Daryeel Wellness — Your Wellness, Our Priority" },
       {
         property: "og:description",
-        content: "Herbal products, vitamins, minerals, sports nutrition and natural wellness consultations — online and in Hargeisa.",
+        content: "Herbal products, dietary supplements, vitamins, sports nutrition and natural wellness consultations — online and in Hargeisa.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

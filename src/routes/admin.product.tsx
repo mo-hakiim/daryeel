@@ -27,9 +27,9 @@ import {
 } from "@/admin/ui";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
-import { SUBCATEGORY_IDS, type SubcategoryId } from "@/data/catalog";
+import type { SubcategoryId } from "@/data/catalog";
 import { productImage } from "@/data/images";
-import { useCatalog, type ProductRow } from "@/data/store";
+import { subcategoriesOf, useCatalog, type ProductRow } from "@/data/store";
 import { en } from "@/i18n/en";
 import type { Localized } from "@/i18n";
 import { insert, remove, update, uploadImage } from "@/lib/supabase";
@@ -140,7 +140,8 @@ function ProductForm({
   const set = <K extends keyof Form>(key: K, value: Form[K]) =>
     setForm((f) => ({ ...f, [key]: value }));
   const category = data.categories.find((c) => c.id === form.category_id);
-  const hasSubcategories = category?.slug === "herbal";
+  const subcategoryOptions = subcategoriesOf(category?.slug);
+  const hasSubcategories = subcategoryOptions.length > 0;
 
   useEffect(() => {
     if (!slugTouched) setForm((f) => ({ ...f, slug: slugify(f.name) }));
@@ -215,7 +216,8 @@ function ProductForm({
         .map((s) => s.trim())
         .filter(Boolean),
       category_id: form.category_id,
-      subcategory: hasSubcategories && form.subcategory ? form.subcategory : null,
+      subcategory:
+        form.subcategory && subcategoryOptions.includes(form.subcategory) ? form.subcategory : null,
       facts: form.facts.trim() || null,
       description: form.description.trim(),
       description_so: form.description_so.trim(),
@@ -412,7 +414,7 @@ function ProductForm({
                 className={inputClass}
               >
                 <option value="">—</option>
-                {SUBCATEGORY_IDS.map((s) => (
+                {subcategoryOptions.map((s) => (
                   <option key={s} value={s}>
                     {en.subcategories[s]}
                   </option>

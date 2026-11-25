@@ -20,11 +20,11 @@ export const Route = createFileRoute("/products/")({
   },
   head: () => ({
     meta: [
-      { title: "Products — Herbal, Minerals, Sports Nutrition & Vitamins | Daryeel Wellness" },
+      { title: "Products — Herbal, Dietary Supplements, Sports Nutrition & Vitamins | Daryeel Wellness" },
       {
         name: "description",
         content:
-          "Browse Daryeel Wellness products: herbal products, natural ingredients, herbal oils, minerals, sports nutrition and vitamins. Order via WhatsApp.",
+          "Browse Daryeel Wellness products: herbal products, natural ingredients, herbal oils, dietary supplements, sports nutrition, gym accessories and vitamins. Order via WhatsApp.",
       },
       { property: "og:title", content: "Products — Daryeel Wellness" },
       { property: "og:description", content: "Four organised categories of genuine wellness products. Order via WhatsApp." },

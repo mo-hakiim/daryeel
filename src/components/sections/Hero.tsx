@@ -8,6 +8,7 @@ import c4 from "@/assets/hero/c4-original-cutout.webp";
 import collagen from "@/assets/hero/collagen-cutout.webp";
 import iso from "@/assets/hero/iso100-dunkin-cutout.webp";
 import magnesium from "@/assets/hero/magnesium-glycinate-cutout.webp";
+import saliida from "@/assets/hero/saliida-mucjisada-cutout.webp";
 import { Button } from "@/components/ui/button";
 import { Leaf } from "@/components/site/Leaf";
 import { useI18n } from "@/i18n";
@@ -130,8 +131,10 @@ export function Hero() {
           <FloatImg src={collagen} mv={[sx, sy]} depth={35} className="left-[0%] top-[24%] w-[27%]" rot={-9} delay={1.1} dur="animate-float-slow" />
           <FloatImg src={c4} mv={[sx, sy]} depth={30} className="right-[-2%] top-[20%] w-[30%]" rot={8} delay={1.2} dur="animate-float-slow" />
           <FloatImg src={ashwagandha} mv={[sx, sy]} depth={60} className="left-[31%] top-[5%] z-10 w-[37%]" rot={-2} delay={1.0} />
-          <FloatImg src={magnesium} mv={[sx, sy]} depth={50} className="bottom-[4%] left-[10%] z-20 w-[26%]" rot={6} delay={1.3} />
-          <FloatImg src={iso} mv={[sx, sy]} depth={45} className="bottom-[1%] right-[6%] z-20 w-[31%]" rot={-6} delay={1.4} dur="animate-float-slow" />
+          <FloatImg src={magnesium} mv={[sx, sy]} depth={50} className="bottom-[4%] left-[6%] z-20 w-[25%]" rot={6} delay={1.3} />
+          <FloatImg src={iso} mv={[sx, sy]} depth={45} className="bottom-[1%] right-[3%] z-20 w-[30%]" rot={-6} delay={1.4} dur="animate-float-slow" />
+          {/* Saliida Mucjisada — best seller, front and centre */}
+          <FloatImg src={saliida} mv={[sx, sy]} depth={70} className="bottom-[1%] left-[40%] z-30 w-[20%]" rot={-3} delay={1.5} />
 
           <motion.div
             initial={{ opacity: 0, x: 30 }}

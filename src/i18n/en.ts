@@ -24,6 +24,7 @@ export const en = {
     backToTop: "Back to top",
     language: "Language",
     keyBenefits: "Key Benefits",
+    keyFeatures: "Key Features",
     pendingBenefits: "Benefits being verified",
     pendingNote:
       "We are confirming this product's exact formulation from the packaging and manufacturer. Ask our team on WhatsApp for full details before use.",
@@ -61,7 +62,7 @@ export const en = {
     floatCardSub: "Personal guidance, online & in-person",
     scroll: "Scroll",
   },
-  marquee: ["Herbal Products", "Sports Nutrition", "Vitamins", "Minerals", "Natural Ingredients", "Herbal Oils", "Wellness Consultation"],
+  marquee: ["Herbal Products", "Sports Nutrition", "Vitamins", "Dietary Supplements", "Natural Ingredients", "Herbal Oils", "Wellness Consultation"],
   about: {
     eyebrow: "About Us",
     title: "Natural health, built on science and trust.",
@@ -144,10 +145,10 @@ export const en = {
       tagline: "Botanicals, natural ingredients & herbal oils",
       description: "Traditional herbs, pure natural ingredients and nourishing herbal oils, carefully sourced for everyday balance.",
     },
-    minerals: {
-      name: "Minerals",
-      tagline: "Essential minerals & daily support",
-      description: "Essential minerals and daily nutritional support — from zinc and iron to omega-3 and collagen.",
+    supplements: {
+      name: "Dietary Supplements",
+      tagline: "Everyday supplements & essential minerals",
+      description: "Everyday dietary supplements — from zinc, iron, omega-3 and collagen to probiotics, amino acids and herbal extracts.",
     },
     sports: {
       name: "Sports Nutrition",
@@ -164,6 +165,8 @@ export const en = {
     general: "Herbal Products",
     ingredients: "Natural Ingredients",
     oils: "Herbal Oils",
+    nutrition: "Supplements",
+    accessories: "Gym Accessories",
   },
   why: {
     eyebrow: "Why Daryeel Wellness",

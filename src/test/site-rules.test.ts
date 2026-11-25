@@ -18,8 +18,8 @@ function keyPaths(o: unknown, prefix = ""): string[] {
 }
 
 describe("official contact details", () => {
-  it("WhatsApp links open a chat with +25263800227", () => {
-    expect(whatsappLink()).toBe("https://wa.me/25263800227");
+  it("WhatsApp links open a chat with +252638000227 (0638000227)", () => {
+    expect(whatsappLink()).toBe("https://wa.me/252638000227");
   });
   it("phone numbers and email match the company profile", () => {
     expect(CONTACT.phones).toEqual(["0634029802", "0637999938"]);
@@ -51,17 +51,29 @@ describe("WhatsApp product ordering", () => {
 
 describe("product catalogue", () => {
   it("has the four main categories, each with products", () => {
-    expect(CATEGORY_IDS).toEqual(["herbal", "minerals", "sports", "vitamins"]);
-    expect(productsIn("herbal")).toHaveLength(19);
-    expect(productsIn("minerals")).toHaveLength(7);
-    expect(productsIn("sports")).toHaveLength(12);
-    expect(productsIn("vitamins")).toHaveLength(9);
+    expect(CATEGORY_IDS).toEqual(["herbal", "supplements", "sports", "vitamins"]);
+    expect(productsIn("herbal")).toHaveLength(33);
+    expect(productsIn("supplements")).toHaveLength(28);
+    expect(productsIn("sports")).toHaveLength(24);
+    expect(productsIn("vitamins")).toHaveLength(10);
   });
 
   it("herbal products are split into general, natural ingredients and herbal oils", () => {
-    expect(productsIn("herbal", "general")).toHaveLength(7);
-    expect(productsIn("herbal", "ingredients")).toHaveLength(6);
-    expect(productsIn("herbal", "oils")).toHaveLength(6);
+    expect(productsIn("herbal", "general")).toHaveLength(4);
+    expect(productsIn("herbal", "ingredients")).toHaveLength(11);
+    expect(productsIn("herbal", "oils")).toHaveLength(18);
+  });
+
+  it("sports splits nutrition from gym accessories", () => {
+    expect(productsIn("sports", "nutrition")).toHaveLength(19);
+    expect(productsIn("sports", "accessories")).toHaveLength(5);
+  });
+
+  it("the six reorganised products live only in Dietary Supplements", () => {
+    for (const slug of ["ashwagandha-gummies", "fenugreek", "magnesium-glycinate", "prostate-plus", "shilajit-ultra", "shilajit-gummies"]) {
+      expect(getProduct(slug)?.category).toBe("supplements");
+    }
+    expect(getProduct("now-liquid-b12-b-complex")?.category).toBe("vitamins");
   });
 
   it("every supplied product photo is used, and every product image exists", () => {

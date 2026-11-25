@@ -68,7 +68,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       {
         name: "description",
         content:
-          "Daryeel Wellness in Hargeisa, Somaliland: herbal products, sports nutrition, vitamins, minerals and natural wellness consultations, online and in person.",
+          "Daryeel Wellness in Hargeisa, Somaliland: herbal products, dietary supplements, sports nutrition, vitamins and natural wellness consultations, online and in person.",
       },
       { name: "author", content: "Daryeel Wellness" },
       { name: "theme-color", content: "#2e700a" },
@@ -76,7 +76,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:title", content: "Daryeel Wellness — Natural Health, Wellness & Consultation" },
       {
         property: "og:description",
-        content: "Herbal products, sports nutrition, vitamins, minerals and natural wellness consultations in Hargeisa.",
+        content: "Herbal products, dietary supplements, sports nutrition, vitamins and natural wellness consultations in Hargeisa.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

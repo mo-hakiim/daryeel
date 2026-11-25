@@ -52,7 +52,7 @@ export function Navbar() {
         aria-label="Main"
       >
         <Link to="/" className="shrink-0" aria-label="Daryeel Wellness — home">
-          <Logo className="h-7 sm:h-8" />
+          <Logo className="h-9 sm:h-10" />
         </Link>
 
         <ul className="hidden items-center gap-1 lg:flex">

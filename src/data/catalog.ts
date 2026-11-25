@@ -1,22 +1,22 @@
 // Product categories and subcategories. Names/taglines live in the i18n dictionaries.
-export const CATEGORY_IDS = ["herbal", "minerals", "sports", "vitamins"] as const;
+export const CATEGORY_IDS = ["herbal", "supplements", "sports", "vitamins"] as const;
 export type CategoryId = (typeof CATEGORY_IDS)[number];
 
-export const SUBCATEGORY_IDS = ["general", "ingredients", "oils"] as const;
+export const SUBCATEGORY_IDS = ["general", "ingredients", "oils", "nutrition", "accessories"] as const;
 export type SubcategoryId = (typeof SUBCATEGORY_IDS)[number];
 
-/** Subcategories that exist inside each category (only Herbal Products has them). */
+/** Subcategories that exist inside each category. */
 export const CATEGORY_SUBCATEGORIES: Record<CategoryId, readonly SubcategoryId[]> = {
-  herbal: SUBCATEGORY_IDS,
-  minerals: [],
-  sports: [],
+  herbal: ["general", "ingredients", "oils"],
+  supplements: [],
+  sports: ["nutrition", "accessories"],
   vitamins: [],
 };
 
 /** Product image key shown on each category card. */
 export const CATEGORY_COVER: Record<CategoryId, string> = {
-  herbal: "ashwagandha",
-  minerals: "ultra-omega-3",
+  herbal: "saliida-mucjisada",
+  supplements: "ashwagandha",
   sports: "c4-original",
   vitamins: "c1000",
 };

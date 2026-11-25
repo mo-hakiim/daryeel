@@ -34,7 +34,7 @@ create table if not exists public.products (
   brand             text,
   aliases           text[] not null default '{}',   -- extra search terms
   category_id       uuid not null references public.categories (id) on delete restrict,
-  subcategory       text check (subcategory in ('general', 'ingredients', 'oils')),
+  subcategory       text check (subcategory in ('general', 'ingredients', 'oils', 'nutrition', 'accessories')),
   facts             text,                       -- pack facts, e.g. "500 mg · 100 capsules"
   description       text not null default '',   -- English
   description_so    text not null default '',   -- Somali

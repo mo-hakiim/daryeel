@@ -12,7 +12,7 @@ export const Route = createFileRoute("/contact")({
       {
         name: "description",
         content:
-          "Contact Daryeel Wellness in Hargeisa, Somaliland: WhatsApp +25263800227, phone 0634029802 / 0637999938, email daryeelhargeisa07@gmail.com.",
+          "Contact Daryeel Wellness in Hargeisa, Somaliland: WhatsApp +252638000227, phone 0634029802 / 0637999938, email daryeelhargeisa07@gmail.com.",
       },
       { property: "og:title", content: "Contact Daryeel Wellness" },
       { property: "og:description", content: "WhatsApp, phone, email and location — online and in-person consultations and orders." },

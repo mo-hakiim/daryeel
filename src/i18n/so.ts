@@ -25,6 +25,7 @@ export const so: Dictionary = {
     backToTop: "Ku noqo kor",
     language: "Luqadda",
     keyBenefits: "Faa'iidooyinka Muhiimka ah",
+    keyFeatures: "Astaamaha Muhiimka ah",
     pendingBenefits: "Faa'iidooyinka waa la hubinayaa",
     pendingNote:
       "Waxaan hubinaynaa halabuurka saxda ah ee alaabtan anagoo eegayna baakadda iyo shirkadda soo saartay. Fadlan kooxdayada kala xiriir WhatsApp si aad u hesho faahfaahin buuxda ka hor isticmaalka.",
@@ -62,7 +63,7 @@ export const so: Dictionary = {
     floatCardSub: "Hagid shakhsi ah, online & fool-ka-fool",
     scroll: "Hoos u dhaadhac",
   },
-  marquee: ["Alaabooyinka Dhireed", "Nafaqada Isboortiga", "Fitamiinno", "Macdano", "Walxo Dabiici ah", "Saliidaha Dhireed", "La-talinta Fayo-qabka"],
+  marquee: ["Alaabooyinka Dhireed", "Nafaqada Isboortiga", "Fitamiinno", "Kaabayaasha Nafaqada", "Walxo Dabiici ah", "Saliidaha Dhireed", "La-talinta Fayo-qabka"],
   about: {
     eyebrow: "Nagu Saabsan",
     title: "Caafimaad dabiici ah oo ku dhisan saynis iyo kalsooni.",
@@ -145,10 +146,10 @@ export const so: Dictionary = {
       tagline: "Dhir, walxo dabiici ah & saliidaha dhireed",
       description: "Dhir dhaqameed, walxo dabiici ah oo saafi ah iyo saliido dhireed oo nafaqeeya, si taxaddar leh loo soo xulay si loo helo dheelitir maalinle ah.",
     },
-    minerals: {
-      name: "Macdano",
-      tagline: "Macdano muhiim ah & taageero maalinle ah",
-      description: "Macdano muhiim ah iyo taageero nafaqo oo maalinle ah — laga bilaabo zinc iyo bir ilaa omega-3 iyo kolajin.",
+    supplements: {
+      name: "Kaabayaasha Nafaqada",
+      tagline: "Kaabayaal maalinle ah & macdano muhiim ah",
+      description: "Kaabayaal nafaqo oo maalinle ah — laga bilaabo zinc, bir, omega-3 iyo kolajin ilaa probiotics, amino acids iyo soosaarka dhirta.",
     },
     sports: {
       name: "Nafaqada Isboortiga",
@@ -165,6 +166,8 @@ export const so: Dictionary = {
     general: "Alaabooyinka Dhireed",
     ingredients: "Walxo Dabiici ah",
     oils: "Saliidaha Dhireed",
+    nutrition: "Kaabayaal",
+    accessories: "Qalabka Jimicsiga",
   },
   why: {
     eyebrow: "Maxaa Daryeel Wellness",
