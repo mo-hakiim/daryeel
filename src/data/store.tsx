@@ -157,13 +157,7 @@ export const bundledCatalog = {
   categories: bundledCategories,
 };
 
-/** Loads the live catalogue. Throws when Supabase is unreachable or returns nothing usable. */
-export async function fetchLiveCatalog() {
-  const [catRows, productRows] = await Promise.all([
-    select<CategoryRow>("categories", "select=*&order=sort_order.asc,name.asc"),
-    select<ProductRow>("products", "select=*&order=sort_order.asc,created_at.asc"),
-  ]);
-  if (!catRows.length || !productRows.length) throw new Error("Supabase catalogue is empty");
+export function catalogFromRows(catRows: CategoryRow[], productRows: ProductRow[]) {
   const slugById = new Map(catRows.map((c) => [c.id, c.slug]));
   return {
     categories: catRows.map(rowToCategory),
@@ -172,6 +166,34 @@ export async function fetchLiveCatalog() {
       .map((p) => rowToProduct(p, slugById.get(p.category_id)!)),
   };
 }
+
+/** Loads the live catalogue. Throws when Supabase is unreachable or returns nothing usable. */
+export async function fetchLiveCatalog() {
+  const [catRows, productRows] = await Promise.all([
+    select<CategoryRow>("categories", "select=*&order=sort_order.asc,name.asc"),
+    select<ProductRow>("products", "select=*&order=sort_order.asc,created_at.asc"),
+  ]);
+  if (!catRows.length || !productRows.length) throw new Error("Supabase catalogue is empty");
+  return catalogFromRows(catRows, productRows);
+}
+
+/**
+ * The catalogue the site is built with: the Supabase snapshot taken by
+ * scripts/prepare-build.mjs when one exists, otherwise the bundled catalogue.
+ * Prerendered pages, product structured data and the browser's first render use it.
+ */
+type Snapshot = { categories: CategoryRow[]; products: ProductRow[] };
+const snapshotFile = Object.values(
+  import.meta.glob<Snapshot>("./catalog-snapshot.json", { eager: true, import: "default" }),
+)[0];
+export const initialCatalog =
+  snapshotFile?.categories?.length && snapshotFile.products?.length
+    ? catalogFromRows(snapshotFile.categories, snapshotFile.products)
+    : bundledCatalog;
+
+/** Lookups on the build-time catalogue, for page heads (titles, structured data). */
+export const findProduct = (slug: string) => initialCatalog.products.find((p) => p.slug === slug);
+export const findCategory = (slug: string) => initialCatalog.categories.find((c) => c.slug === slug);
 
 type CatalogValue = {
   products: CatalogProduct[];
@@ -185,7 +207,7 @@ type CatalogValue = {
 const CatalogContext = createContext<CatalogValue | null>(null);
 
 export function CatalogProvider({ children }: { children: ReactNode }) {
-  const [data, setData] = useState(bundledCatalog);
+  const [data, setData] = useState(initialCatalog);
   const [status, setStatus] = useState<CatalogStatus>(supabaseEnabled ? "loading" : "bundled");
   const [tick, setTick] = useState(0);
 
@@ -219,7 +241,7 @@ export function CatalogProvider({ children }: { children: ReactNode }) {
 export function useCatalog() {
   const ctx = useContext(CatalogContext);
   const value = ctx ?? {
-    ...bundledCatalog,
+    ...initialCatalog,
     status: "bundled" as const,
     pending: false,
     reload: () => {},

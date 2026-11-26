@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { AnimatePresence, motion } from "motion/react";
 import { AlertTriangle, CalendarCheck, Check, ChevronRight, Clock, Info } from "lucide-react";
@@ -10,11 +10,25 @@ import { CatalogLoading, NotFound } from "@/components/site/NotFound";
 import { Reveal } from "@/components/site/Reveal";
 import { WhatsAppIcon } from "@/components/site/WhatsAppIcon";
 import { productImage } from "@/data/images";
-import { getProduct } from "@/data/products";
-import { displayName, formatPrice, useCatalog, type CatalogProduct } from "@/data/store";
+import {
+  displayName,
+  findCategory,
+  findProduct,
+  formatPrice,
+  useCatalog,
+  type CatalogProduct,
+} from "@/data/store";
 import { en } from "@/i18n/en";
 import { fill, useI18n } from "@/i18n";
 import { whatsappLink } from "@/lib/contact";
+import {
+  breadcrumbJsonLd,
+  pageHead,
+  productJsonLd,
+  productMeta,
+  productTitleName,
+  usePageMeta,
+} from "@/lib/seo";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/product/$slug")({
@@ -22,21 +36,23 @@ export const Route = createFileRoute("/product/$slug")({
   // resolved in the page once the live catalogue has loaded.
   loader: ({ params }) => ({ slug: params.slug }),
   head: ({ loaderData }) => {
-    const p = loaderData ? getProduct(loaderData.slug) : undefined;
+    const p = loaderData ? findProduct(loaderData.slug) : undefined;
     if (!p) {
-      return { meta: [{ title: "Product unavailable — Daryeel Wellness" }, { name: "robots", content: "noindex" }] };
+      // Not in the build-time catalogue: the page resolves it in the browser.
+      return {
+        meta: [{ title: "Daryeel Wellness – Hargeisa" }, { name: "robots", content: "noindex" }],
+      };
     }
-    const title = `${p.name}${p.brand ? ` by ${p.brand}` : ""} — Daryeel Wellness`;
-    return {
-      meta: [
-        { title },
-        { name: "description", content: p.description.en },
-        { property: "og:title", content: title },
-        { property: "og:description", content: `${p.description.en} ${en.categories[p.category].name}. Order via WhatsApp.` },
-        { property: "og:type", content: "product" },
-        { name: "twitter:card", content: "summary_large_image" },
-      ],
-    };
+    const category = findCategory(p.category);
+    const crumbs = [
+      { name: "Products", path: "/products" },
+      ...(category ? [{ name: category.name.en, path: `/products/${category.slug}` }] : []),
+      { name: productTitleName(p), path: `/product/${p.slug}` },
+    ];
+    return pageHead(productMeta(p, en.seo), `/product/${p.slug}`, {
+      type: "product",
+      jsonLd: [productJsonLd(p, category?.name.en), breadcrumbJsonLd(crumbs)],
+    });
   },
   component: ProductPage,
 });
@@ -55,26 +71,34 @@ function ProductDetails({ product }: { product: CatalogProduct }) {
   const [active, setActive] = useState(0);
   const [zoom, setZoom] = useState<{ x: number; y: number } | null>(null);
   const name = displayName(product, lang);
-  const related = products.filter((p) => p.category === product.category && p.slug !== product.slug).slice(0, 4);
+  const related = products
+    .filter((p) => p.category === product.category && p.slug !== product.slug)
+    .slice(0, 4);
   const categoryName = getCategory(product.category)?.name[lang] ?? "";
   const activeKey = product.images[active] ?? product.images[0] ?? "";
   const soldOut = product.inStock === false;
 
-  useEffect(() => {
-    document.title = `${product.name}${product.brand ? ` by ${product.brand}` : ""} — Daryeel Wellness`;
-  }, [product.name, product.brand]);
+  usePageMeta(productMeta(product, t.seo, lang));
 
   return (
     <>
       <section className="relative overflow-hidden bg-hero pb-20 pt-28 sm:pt-36">
         <div className="blob -right-20 top-20 h-96 w-96 bg-lime/25" />
         <div className="container-page relative">
-          <nav aria-label="Breadcrumb" className="mb-8 flex flex-wrap items-center gap-1.5 text-sm text-muted-foreground">
+          <nav
+            aria-label="Breadcrumb"
+            className="mb-8 flex flex-wrap items-center gap-1.5 text-sm text-muted-foreground"
+          >
             <Link to="/products" search={{}} className="hover:text-primary">
               {t.nav.products}
             </Link>
             <ChevronRight className="size-3.5" />
-            <Link to="/products/$category" params={{ category: product.category }} search={{}} className="hover:text-primary">
+            <Link
+              to="/products/$category"
+              params={{ category: product.category }}
+              search={{}}
+              className="hover:text-primary"
+            >
               {categoryName}
             </Link>
             <ChevronRight className="size-3.5" />
@@ -92,7 +116,10 @@ function ProductDetails({ product }: { product: CatalogProduct }) {
                 onPointerMove={(e) => {
                   if (e.pointerType !== "mouse") return;
                   const r = e.currentTarget.getBoundingClientRect();
-                  setZoom({ x: ((e.clientX - r.left) / r.width) * 100, y: ((e.clientY - r.top) / r.height) * 100 });
+                  setZoom({
+                    x: ((e.clientX - r.left) / r.width) * 100,
+                    y: ((e.clientY - r.top) / r.height) * 100,
+                  });
                 }}
                 onPointerLeave={() => setZoom(null)}
               >
@@ -100,6 +127,9 @@ function ProductDetails({ product }: { product: CatalogProduct }) {
                   <motion.img
                     key={activeKey}
                     src={productImage(activeKey)}
+                    width={900}
+                    height={900}
+                    fetchPriority="high"
                     alt={product.imageLabels?.[active]?.[lang] ?? name}
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
@@ -125,16 +155,27 @@ function ProductDetails({ product }: { product: CatalogProduct }) {
                       aria-label={product.imageLabels?.[i]?.[lang] ?? `${name} ${i + 1}`}
                       className={cn(
                         "h-20 w-20 cursor-pointer overflow-hidden rounded-2xl border-2 bg-card p-1.5 transition-all",
-                        i === active ? "border-primary shadow-soft" : "border-transparent opacity-70 hover:opacity-100",
+                        i === active
+                          ? "border-primary shadow-soft"
+                          : "border-transparent opacity-70 hover:opacity-100",
                       )}
                     >
-                      <img src={productImage(img)} alt="" className="h-full w-full object-contain" />
+                      <img
+                        src={productImage(img)}
+                        width={900}
+                        height={900}
+                        decoding="async"
+                        alt=""
+                        className="h-full w-full object-contain"
+                      />
                     </button>
                   ))}
                 </div>
               )}
               {product.imageLabels?.[active] && (
-                <p className="mt-3 text-sm text-muted-foreground">{product.imageLabels[active]![lang]}</p>
+                <p className="mt-3 text-sm text-muted-foreground">
+                  {product.imageLabels[active]![lang]}
+                </p>
               )}
             </div>
 
@@ -147,16 +188,23 @@ function ProductDetails({ product }: { product: CatalogProduct }) {
               <span className="inline-flex rounded-full bg-secondary px-3 py-1 text-xs font-bold uppercase tracking-wider text-primary">
                 {product.subcategory ? t.subcategories[product.subcategory] : categoryName}
               </span>
-              <h1 className="mt-4 text-balance text-4xl font-medium leading-[1.05] sm:text-5xl">{name}</h1>
+              <h1 className="mt-4 text-balance text-4xl font-medium leading-[1.05] sm:text-5xl">
+                {name}
+              </h1>
               {product.brand && (
                 <p className="mt-3 text-sm text-muted-foreground">
-                  {t.common.brand}: <span className="font-semibold text-foreground">{product.brand}</span>
+                  {t.common.brand}:{" "}
+                  <span className="font-semibold text-foreground">{product.brand}</span>
                 </p>
               )}
-              {product.facts && <p className="mt-1 text-sm text-muted-foreground">{product.facts}</p>}
+              {product.facts && (
+                <p className="mt-1 text-sm text-muted-foreground">{product.facts}</p>
+              )}
               {(product.price != null || soldOut) && (
                 <div className="mt-5 flex flex-wrap items-center gap-3">
-                  {product.price != null && <p className="text-3xl font-bold text-primary">{formatPrice(product.price)}</p>}
+                  {product.price != null && (
+                    <p className="text-3xl font-bold text-primary">{formatPrice(product.price)}</p>
+                  )}
                   {soldOut && (
                     <span className="rounded-full bg-foreground/85 px-3 py-1 text-xs font-bold uppercase tracking-wider text-background">
                       {t.common.outOfStock}
@@ -165,14 +213,20 @@ function ProductDetails({ product }: { product: CatalogProduct }) {
                 </div>
               )}
 
-              <h2 className="mt-8 font-sans text-xs font-bold uppercase tracking-[0.16em] text-muted-foreground">{t.common.productDetails}</h2>
-              <p className="mt-2 text-lg leading-relaxed text-foreground/85">{product.description[lang]}</p>
+              <h2 className="mt-8 font-sans text-xs font-bold uppercase tracking-[0.16em] text-muted-foreground">
+                {t.common.productDetails}
+              </h2>
+              <p className="mt-2 text-lg leading-relaxed text-foreground/85">
+                {product.description[lang]}
+              </p>
 
               <div className="mt-8 rounded-3xl border bg-card p-6 shadow-soft">
                 {product.benefits ? (
                   <>
                     <h2 className="font-sans text-xs font-bold uppercase tracking-[0.16em] text-primary">
-                      {product.subcategory === "accessories" ? t.common.keyFeatures : t.common.keyBenefits}
+                      {product.subcategory === "accessories"
+                        ? t.common.keyFeatures
+                        : t.common.keyBenefits}
                     </h2>
                     <ul className="mt-4 space-y-3">
                       {product.benefits.map((b) => (
@@ -187,7 +241,9 @@ function ProductDetails({ product }: { product: CatalogProduct }) {
                   </>
                 ) : product.suppliedBenefits ? (
                   <>
-                    <h2 className="font-sans text-xs font-bold uppercase tracking-[0.16em] text-primary">{t.common.suppliedBenefits}</h2>
+                    <h2 className="font-sans text-xs font-bold uppercase tracking-[0.16em] text-primary">
+                      {t.common.suppliedBenefits}
+                    </h2>
                     <ul className="mt-4 space-y-3">
                       {product.suppliedBenefits.map((b) => (
                         <li key={b.en} className="flex gap-3">
@@ -205,7 +261,9 @@ function ProductDetails({ product }: { product: CatalogProduct }) {
                     <Clock className="mt-0.5 size-5 shrink-0 text-primary" />
                     <div>
                       <h2 className="font-sans text-sm font-bold">{t.common.pendingBenefits}</h2>
-                      <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{t.common.pendingNote}</p>
+                      <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
+                        {t.common.pendingNote}
+                      </p>
                     </div>
                   </div>
                 )}
@@ -215,7 +273,9 @@ function ProductDetails({ product }: { product: CatalogProduct }) {
                 <Info className="mt-0.5 size-5 shrink-0 text-primary" />
                 <div>
                   <h2 className="font-sans text-sm font-bold">{t.common.directions}</h2>
-                  <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{t.common.directionsText}</p>
+                  <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
+                    {t.common.directionsText}
+                  </p>
                 </div>
               </div>
 
@@ -224,14 +284,20 @@ function ProductDetails({ product }: { product: CatalogProduct }) {
                   <AlertTriangle className="mt-0.5 size-5 shrink-0 text-destructive" />
                   <div>
                     <h2 className="font-sans text-sm font-bold">{t.common.caution}</h2>
-                    <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{product.caution[lang]}</p>
+                    <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
+                      {product.caution[lang]}
+                    </p>
                   </div>
                 </div>
               )}
 
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                 <Button asChild size="lg" variant="whatsapp">
-                  <a href={whatsappLink(fill(t.whatsapp.product, { product: name }))} target="_blank" rel="noopener noreferrer">
+                  <a
+                    href={whatsappLink(fill(t.whatsapp.product, { product: name }))}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
                     <WhatsAppIcon className="size-5" />
                     {t.common.orderWhatsApp}
                   </a>

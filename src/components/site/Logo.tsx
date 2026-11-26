@@ -1,5 +1,5 @@
-import logoColor from "@/assets/brand/daryeel-logo-color.png";
-import logoLight from "@/assets/brand/daryeel-logo-light.png";
+import logoColor from "@/assets/brand/daryeel-logo-color.webp";
+import logoLight from "@/assets/brand/daryeel-logo-light.webp";
 import { cn } from "@/lib/utils";
 
 /** Official Daryeel Wellness logo. "color" for light backgrounds, "light" for green/dark backgrounds. */
@@ -9,8 +9,8 @@ export function Logo({ variant = "color", className }: { variant?: "color" | "li
     <img
       src={src}
       alt="Daryeel Wellness"
-      width={803}
-      height={237}
+      width={480}
+      height={142}
       className={cn("h-9 w-auto select-none", className)}
       draggable={false}
     />

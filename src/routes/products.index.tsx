@@ -7,36 +7,27 @@ import { PageHeader } from "@/components/site/PageHeader";
 import { SectionHeading } from "@/components/site/SectionHeading";
 import { isSubcategoryId, type SubcategoryId } from "@/data/catalog";
 import { useI18n } from "@/i18n";
+import { pageHead, usePageMeta } from "@/lib/seo";
+import { en } from "@/i18n/en";
 
 type Search = { category?: string; sub?: SubcategoryId; q?: string };
 
 export const Route = createFileRoute("/products/")({
   validateSearch: (s: Record<string, unknown>): Search => {
     const out: Search = {};
-    if (typeof s["category"] === "string" && /^[a-z0-9-]{1,60}$/.test(s["category"])) out.category = s["category"];
+    if (typeof s["category"] === "string" && /^[a-z0-9-]{1,60}$/.test(s["category"]))
+      out.category = s["category"];
     if (typeof s["sub"] === "string" && isSubcategoryId(s["sub"])) out.sub = s["sub"];
     if (typeof s["q"] === "string" && s["q"]) out.q = s["q"].slice(0, 80);
     return out;
   },
-  head: () => ({
-    meta: [
-      { title: "Products — Herbal, Dietary Supplements, Sports Nutrition & Vitamins | Daryeel Wellness" },
-      {
-        name: "description",
-        content:
-          "Browse Daryeel Wellness products: herbal products, natural ingredients, herbal oils, dietary supplements, sports nutrition, gym accessories and vitamins. Order via WhatsApp.",
-      },
-      { property: "og:title", content: "Products — Daryeel Wellness" },
-      { property: "og:description", content: "Four organised categories of genuine wellness products. Order via WhatsApp." },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
-    ],
-  }),
+  head: () => pageHead(en.seo.products, "/products"),
   component: ProductsPage,
 });
 
 function ProductsPage() {
   const { t } = useI18n();
+  usePageMeta(t.seo.products);
   const search = Route.useSearch();
   const navigate = useNavigate({ from: "/products/" });
   const onChange = (next: BrowserState) => {
@@ -49,7 +40,11 @@ function ProductsPage() {
 
   return (
     <>
-      <PageHeader eyebrow={t.catalog.eyebrow} title={t.catalog.title} subtitle={t.catalog.subtitle} />
+      <PageHeader
+        eyebrow={t.catalog.eyebrow}
+        title={t.catalog.title}
+        subtitle={t.catalog.subtitle}
+      />
       <section className="pb-8 pt-16">
         <div className="container-page">
           <CategoryCards />

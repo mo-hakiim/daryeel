@@ -4,6 +4,8 @@
 //     nitro (build-only), VITE_* env injection, @ path alias, React/TanStack dedupe,
 //     error logger plugins, and sandbox detection (port/host/strictPort).
 // You can pass additional config via defineConfig({ vite: { ... }, etc... }) if needed.
+import { existsSync, readFileSync } from "node:fs";
+
 import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 
 import { CATEGORY_IDS } from "./src/data/catalog";
@@ -17,7 +19,19 @@ const trimmedBase = (process.env.BASE_PATH ?? "/").replace(/^\/+|\/+$/g, "");
 const base = trimmedBase ? `/${trimmedBase}/` : "/";
 
 // Every page is prerendered to static HTML. Category and product pages come from the
-// catalogue data, so adding a product adds its page automatically.
+// live catalogue snapshot (scripts/prepare-build.mjs) when there is one, otherwise from
+// the bundled catalogue — so products added in the dashboard get their own page.
+type SnapshotRow = { id: string; slug: string; category_id?: string };
+const snapshotPath = new URL("./src/data/catalog-snapshot.json", import.meta.url);
+const snapshot: { categories: SnapshotRow[]; products: SnapshotRow[] } | null = existsSync(snapshotPath)
+  ? JSON.parse(readFileSync(snapshotPath, "utf8"))
+  : null;
+const liveCategoryIds = new Set(snapshot?.categories.map((c) => c.id));
+const categorySlugs = snapshot ? snapshot.categories.map((c) => c.slug) : [...CATEGORY_IDS];
+const productSlugs = snapshot
+  ? snapshot.products.filter((p) => liveCategoryIds.has(p.category_id!)).map((p) => p.slug)
+  : products.map((p) => p.slug);
+
 const pages = [
   "/",
   "/about",
@@ -25,8 +39,8 @@ const pages = [
   "/consultation",
   "/contact",
   "/products",
-  ...CATEGORY_IDS.map((id) => `/products/${id}`),
-  ...products.map((p) => `/product/${p.slug}`),
+  ...categorySlugs.map((slug) => `/products/${slug}`),
+  ...productSlugs.map((slug) => `/product/${slug}`),
   // Admin dashboard (not linked from the site; noindex). Rendered as an empty shell,
   // the sign-in check runs in the browser.
   "/admin",

@@ -22,7 +22,7 @@ export function AboutIntro({ withLink = false }: { withLink?: boolean }) {
       <div className="container-page grid items-center gap-14 lg:grid-cols-2 lg:gap-20">
         <Reveal className="relative">
           <div className="relative overflow-hidden rounded-[2.5rem] shadow-lift">
-            <img src={botanicals} alt={t.about.imageAlt} loading="lazy" className="aspect-[4/5] w-full object-cover sm:aspect-[5/5]" />
+            <img src={botanicals} alt={t.about.imageAlt} loading="lazy" decoding="async" width={1200} height={1096} className="aspect-[4/5] w-full object-cover sm:aspect-[5/5]" />
             <div className="absolute inset-0 bg-gradient-to-t from-forest/40 via-transparent to-transparent" />
           </div>
           <div className="glass absolute -bottom-6 right-4 rounded-3xl p-5 shadow-lift sm:-right-6">

@@ -15,30 +15,17 @@ import { Updates } from "@/components/sections/Updates";
 import { WhyChoose } from "@/components/sections/WhyChoose";
 import { SectionHeading } from "@/components/site/SectionHeading";
 import { useI18n } from "@/i18n";
+import { businessJsonLd, pageHead, usePageMeta } from "@/lib/seo";
+import { en } from "@/i18n/en";
 
 export const Route = createFileRoute("/")({
-  head: () => ({
-    meta: [
-      { title: "Daryeel Wellness — Your Wellness, Our Priority" },
-      {
-        name: "description",
-        content:
-          "Natural wellness solutions, premium supplements, sports nutrition and personalised health consultations in Hargeisa, Somaliland. Order on WhatsApp.",
-      },
-      { property: "og:title", content: "Daryeel Wellness — Your Wellness, Our Priority" },
-      {
-        property: "og:description",
-        content: "Herbal products, dietary supplements, vitamins, sports nutrition and natural wellness consultations — online and in Hargeisa.",
-      },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
-    ],
-  }),
+  head: () => pageHead(en.seo.home, "/", { jsonLd: [businessJsonLd()] }),
   component: Index,
 });
 
 function Index() {
   const { t } = useI18n();
+  usePageMeta(t.seo.home);
   return (
     <>
       <Hero />
@@ -48,7 +35,11 @@ function Index() {
 
       <section className="py-24 sm:py-32">
         <div className="container-page">
-          <SectionHeading eyebrow={t.catalog.eyebrow} title={t.catalog.title} subtitle={t.catalog.subtitle} />
+          <SectionHeading
+            eyebrow={t.catalog.eyebrow}
+            title={t.catalog.title}
+            subtitle={t.catalog.subtitle}
+          />
           <div className="mt-14">
             <CategoryCards />
           </div>
@@ -58,7 +49,11 @@ function Index() {
       <section className="bg-sage py-24 sm:py-28">
         <div className="container-page">
           <div className="flex flex-col items-start justify-between gap-6 sm:flex-row sm:items-end">
-            <SectionHeading align="left" eyebrow={t.catalog.featuredEyebrow} title={t.catalog.featuredTitle} />
+            <SectionHeading
+              align="left"
+              eyebrow={t.catalog.featuredEyebrow}
+              title={t.catalog.featuredTitle}
+            />
             <Button asChild variant="outline">
               <Link to="/products" search={{}}>
                 {t.common.allProducts}

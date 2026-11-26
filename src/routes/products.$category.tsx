@@ -5,11 +5,12 @@ import { Disclaimer } from "@/components/products/Disclaimer";
 import { ProductBrowser, type BrowserState } from "@/components/products/ProductBrowser";
 import { Leaf } from "@/components/site/Leaf";
 import { CatalogLoading, NotFound } from "@/components/site/NotFound";
-import { isCategoryId, isSubcategoryId, type SubcategoryId } from "@/data/catalog";
+import { isSubcategoryId, type SubcategoryId } from "@/data/catalog";
 import { productImage } from "@/data/images";
-import { categoryCover, useCatalog } from "@/data/store";
+import { categoryCover, findCategory, useCatalog } from "@/data/store";
 import { en } from "@/i18n/en";
 import { fill, useI18n } from "@/i18n";
+import { breadcrumbJsonLd, categoryMeta, pageHead, usePageMeta } from "@/lib/seo";
 import { cn } from "@/lib/utils";
 
 type Search = { sub?: SubcategoryId; q?: string };
@@ -24,20 +25,19 @@ export const Route = createFileRoute("/products/$category")({
   // Categories added in the dashboard are resolved in the page once the live catalogue loads.
   loader: ({ params }) => ({ category: params["category"] }),
   head: ({ loaderData }) => {
-    const c = loaderData && isCategoryId(loaderData.category) ? loaderData.category : undefined;
-    const name = c ? en.categories[c].name : "Products";
-    const desc = c ? en.categories[c].description : "Daryeel Wellness products.";
-    return {
-      meta: [
-        { title: `${name} — Daryeel Wellness` },
-        { name: "description", content: desc },
-        { property: "og:title", content: `${name} — Daryeel Wellness` },
-        { property: "og:description", content: desc },
-        { property: "og:type", content: "website" },
-        { name: "twitter:card", content: "summary_large_image" },
-        ...(c ? [] : [{ name: "robots", content: "noindex" }]),
+    const c = loaderData ? findCategory(loaderData.category) : undefined;
+    if (!c)
+      return {
+        meta: [{ title: "Daryeel Wellness – Hargeisa" }, { name: "robots", content: "noindex" }],
+      };
+    return pageHead(categoryMeta(c, en.seo), `/products/${c.slug}`, {
+      jsonLd: [
+        breadcrumbJsonLd([
+          { name: "Products", path: "/products" },
+          { name: c.name.en, path: `/products/${c.slug}` },
+        ]),
       ],
-    };
+    });
   },
   component: CategoryPage,
 });
@@ -56,6 +56,7 @@ function CategoryView({ category }: { category: string }) {
   const search = Route.useSearch();
   const navigate = useNavigate({ from: "/products/$category" });
   const info = { name: cat.name[lang], description: cat.description[lang] };
+  usePageMeta(categoryMeta(cat, t.seo, lang));
   const count = productsIn(category).length;
 
   const onChange = (next: BrowserState) => {
@@ -73,7 +74,10 @@ function CategoryView({ category }: { category: string }) {
         <Leaf className="absolute bottom-0 left-[40%] h-56 w-36 rotate-12 text-lime/10" />
         <div className="container-page relative grid items-center gap-8 md:grid-cols-[1.3fr_1fr]">
           <div>
-            <nav aria-label="Breadcrumb" className="mb-6 flex items-center gap-1.5 text-sm text-forest-muted">
+            <nav
+              aria-label="Breadcrumb"
+              className="mb-6 flex items-center gap-1.5 text-sm text-forest-muted"
+            >
               <Link to="/products" search={{}} className="hover:text-lime">
                 {t.nav.products}
               </Link>
@@ -81,8 +85,12 @@ function CategoryView({ category }: { category: string }) {
               <span className="text-forest-foreground">{info.name}</span>
             </nav>
             <p className="eyebrow mb-4 text-lime">{fill(t.common.productsCount, { n: count })}</p>
-            <h1 className="text-balance text-5xl font-medium leading-[1.02] sm:text-6xl">{info.name}</h1>
-            <p className="mt-5 max-w-xl text-lg leading-relaxed text-forest-muted">{info.description}</p>
+            <h1 className="text-balance text-5xl font-medium leading-[1.02] sm:text-6xl">
+              {info.name}
+            </h1>
+            <p className="mt-5 max-w-xl text-lg leading-relaxed text-forest-muted">
+              {info.description}
+            </p>
             <div className="mt-8 flex flex-wrap gap-2">
               {categories.map(({ slug: c, name }) => (
                 <Link
@@ -92,7 +100,9 @@ function CategoryView({ category }: { category: string }) {
                   search={{}}
                   className={cn(
                     "rounded-full px-4 py-2 text-sm font-semibold transition-colors",
-                    c === category ? "bg-lime text-lime-foreground" : "glass-dark text-forest-foreground hover:bg-forest-foreground/15",
+                    c === category
+                      ? "bg-lime text-lime-foreground"
+                      : "glass-dark text-forest-foreground hover:bg-forest-foreground/15",
                   )}
                 >
                   {name[lang]}
@@ -105,6 +115,9 @@ function CategoryView({ category }: { category: string }) {
             <img
               key={category}
               src={productImage(categoryCover(cat, products))}
+              width={900}
+              height={900}
+              decoding="async"
               alt=""
               className="relative h-full w-full animate-float-slow object-contain p-12 mix-blend-multiply"
             />
@@ -113,7 +126,12 @@ function CategoryView({ category }: { category: string }) {
       </section>
       <section className="py-14 sm:py-20">
         <div className="container-page">
-          <ProductBrowser key={category} state={{ category, sub: search.sub, q: search.q }} onChange={onChange} lockCategory />
+          <ProductBrowser
+            key={category}
+            state={{ category, sub: search.sub, q: search.q }}
+            onChange={onChange}
+            lockCategory
+          />
           <Disclaimer className="mt-14" />
         </div>
       </section>

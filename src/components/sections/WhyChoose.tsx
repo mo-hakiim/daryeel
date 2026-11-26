@@ -39,6 +39,9 @@ export function WhyChoose() {
             src={consultation}
             alt={t.consultation.imageAlt}
             loading="lazy"
+            decoding="async"
+            width={1400}
+            height={1279}
             className="relative aspect-[4/4.2] w-full rounded-[2.5rem] object-cover shadow-lift"
           />
           <div className="glass absolute -bottom-6 left-6 right-6 rounded-3xl p-5 shadow-lift sm:left-auto sm:w-72">

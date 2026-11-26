@@ -285,6 +285,46 @@ export const en = {
     admin: "Admin",
     chatCta: "Questions? Chat with us on WhatsApp",
   },
+  seo: {
+    home: {
+      title: "Daryeel Wellness – Supplements & Vitamins in Hargeisa",
+      description:
+        "Herbal products, dietary supplements, vitamins and sports nutrition in Hargeisa, Somaliland, with natural wellness consultations. Order easily on WhatsApp.",
+    },
+    products: {
+      title: "Products – Supplements, Vitamins & Herbal | Daryeel Wellness Hargeisa",
+      description:
+        "Browse genuine dietary supplements, vitamins, herbal oils, sports nutrition and gym accessories at Daryeel Wellness in Hargeisa. Order any product on WhatsApp.",
+    },
+    about: {
+      title: "About Us – Daryeel Wellness, Hargeisa",
+      description:
+        "Daryeel Wellness is a natural health and wellness company in Hargeisa, Somaliland, offering trusted supplements and personal wellness guidance since June 2024.",
+    },
+    services: {
+      title: "Our Services – Daryeel Wellness, Hargeisa",
+      description:
+        "Wellness consultations, quality supplements, sports nutrition and herbal products, with easy ordering, local delivery and in-person support in Hargeisa.",
+    },
+    consultation: {
+      title: "Book a Wellness Consultation – Daryeel Wellness Hargeisa",
+      description:
+        "Book a natural wellness consultation with Daryeel Wellness in Hargeisa, online or in person, for personal guidance on supplements and healthy routines.",
+    },
+    contact: {
+      title: "Contact Us – Daryeel Wellness, Hargeisa",
+      description:
+        "Contact Daryeel Wellness in Hargeisa, Somaliland: WhatsApp +252 63 8000227, phone 0634029802 / 0637999938 and email.",
+    },
+    category: {
+      title: "{name} in Hargeisa | Daryeel Wellness",
+      description: "{description} Order on WhatsApp from Daryeel Wellness in Hargeisa.",
+    },
+    product: {
+      title: "{name} – Buy in Hargeisa | Daryeel Wellness",
+      description: "{description} Order on WhatsApp from Daryeel Wellness, Hargeisa.",
+    },
+  },
   notFound: {
     title: "This page wandered off the path.",
     text: "The page you're looking for doesn't exist or has moved.",

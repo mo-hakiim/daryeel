@@ -39,3 +39,6 @@ package-lock.json
 .env
 .env.*
 !.env.example
+
+# Generated before each build by scripts/prepare-build.mjs
+src/data/catalog-snapshot.json

@@ -24,7 +24,7 @@ export function ConsultationSection({ showHeading = true }: { showHeading?: bool
             ))}
           </Reveal>
           <Reveal delay={0.2} className="mt-10 hidden overflow-hidden rounded-[2rem] lg:block">
-            <img src={consultation} alt={c.imageAlt} loading="lazy" className="aspect-[16/11] w-full object-cover" />
+            <img src={consultation} alt={c.imageAlt} loading="lazy" decoding="async" width={1400} height={1279} className="aspect-[16/11] w-full object-cover" />
           </Reveal>
         </div>
         <Reveal delay={0.1} className="rounded-[2rem] bg-card p-6 text-card-foreground shadow-lift sm:p-10">

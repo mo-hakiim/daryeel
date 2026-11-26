@@ -199,6 +199,7 @@ function FloatImg({
     >
       <img
         src={src}
+        decoding="async"
         alt=""
         aria-hidden="true"
         className={`drop-product w-full ${dur}`}

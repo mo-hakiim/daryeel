@@ -40,6 +40,9 @@ export function CategoryCards() {
                   src={productImage(categoryCover(cat, products))}
                   alt=""
                   loading="lazy"
+                  decoding="async"
+                  width={900}
+                  height={900}
                   className="-mb-4 -ml-2 h-48 w-48 object-contain mix-blend-multiply transition-transform duration-700 ease-out group-hover:-translate-y-2 group-hover:rotate-[-3deg] group-hover:scale-105"
                 />
                 <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-forest text-forest-foreground transition-all duration-300 group-hover:bg-lime group-hover:text-lime-foreground">

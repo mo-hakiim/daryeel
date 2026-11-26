@@ -4,30 +4,24 @@ import { ContactSection } from "@/components/sections/Contact";
 import { Faq } from "@/components/sections/Faq";
 import { PageHeader } from "@/components/site/PageHeader";
 import { useI18n } from "@/i18n";
+import { businessJsonLd, pageHead, usePageMeta } from "@/lib/seo";
+import { en } from "@/i18n/en";
 
 export const Route = createFileRoute("/contact")({
-  head: () => ({
-    meta: [
-      { title: "Contact Us — Daryeel Wellness" },
-      {
-        name: "description",
-        content:
-          "Contact Daryeel Wellness in Hargeisa, Somaliland: WhatsApp +252638000227, phone 0634029802 / 0637999938, email daryeelhargeisa07@gmail.com.",
-      },
-      { property: "og:title", content: "Contact Daryeel Wellness" },
-      { property: "og:description", content: "WhatsApp, phone, email and location — online and in-person consultations and orders." },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
-    ],
-  }),
+  head: () => pageHead(en.seo.contact, "/contact", { jsonLd: [businessJsonLd()] }),
   component: ContactPage,
 });
 
 function ContactPage() {
   const { t } = useI18n();
+  usePageMeta(t.seo.contact);
   return (
     <>
-      <PageHeader eyebrow={t.contact.eyebrow} title={t.contact.title} subtitle={t.contact.subtitle} />
+      <PageHeader
+        eyebrow={t.contact.eyebrow}
+        title={t.contact.title}
+        subtitle={t.contact.subtitle}
+      />
       <ContactSection showHeading={false} />
       <Faq />
     </>

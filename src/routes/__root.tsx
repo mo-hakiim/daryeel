@@ -64,29 +64,14 @@ function ErrorComponent({ error, reset }: ErrorComponentProps) {
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
   beforeLoad: () => ({ lang: readSavedLang() }),
   head: () => ({
+    // Each public page sets its own title, description, canonical URL, preview tags and
+    // structured data through pageHead() in src/lib/seo.ts.
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Daryeel Wellness — Natural Health, Wellness & Consultation" },
-      {
-        name: "description",
-        content:
-          "Daryeel Wellness in Hargeisa, Somaliland: herbal products, dietary supplements, sports nutrition, vitamins and natural wellness consultations, online and in person.",
-      },
+      { title: "Daryeel Wellness – Supplements & Vitamins in Hargeisa" },
       { name: "author", content: "Daryeel Wellness" },
       { name: "theme-color", content: "#2e700a" },
-      { property: "og:site_name", content: "Daryeel Wellness" },
-      {
-        property: "og:title",
-        content: "Daryeel Wellness — Natural Health, Wellness & Consultation",
-      },
-      {
-        property: "og:description",
-        content:
-          "Herbal products, dietary supplements, sports nutrition, vitamins and natural wellness consultations in Hargeisa.",
-      },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },

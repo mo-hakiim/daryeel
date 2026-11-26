@@ -286,6 +286,46 @@ export const so: Dictionary = {
     admin: "Maamulka",
     chatCta: "Su'aalo ma qabtaa? Nagala hadal WhatsApp",
   },
+  seo: {
+    home: {
+      title: "Daryeel Wellness – Kaabayaal & Fitamiinno Hargeysa",
+      description:
+        "Alaabooyin dhireed, kaabayaal nafaqo, fitamiinno iyo nafaqada isboortiga oo Hargeysa, Somaliland, iyo la-talin fayo-qab. Si fudud ugu dalbo WhatsApp.",
+    },
+    products: {
+      title: "Alaabta – Kaabayaal, Fitamiinno & Dhir | Daryeel Wellness Hargeysa",
+      description:
+        "Kaabayaal nafaqo oo dhab ah, fitamiinno, saliidaha dhireed, nafaqada isboortiga iyo qalabka jimicsiga ee Daryeel Wellness, Hargeysa. Ku dalbo WhatsApp.",
+    },
+    about: {
+      title: "Nagu Saabsan – Daryeel Wellness, Hargeysa",
+      description:
+        "Daryeel Wellness waa shirkad fayo-qab dabiici ah oo ku taal Hargeysa, Somaliland, bixisa kaabayaal la isku halleyn karo iyo hagid shakhsi ah tan iyo June 2024.",
+    },
+    services: {
+      title: "Adeegyadayada – Daryeel Wellness, Hargeysa",
+      description:
+        "La-talin fayo-qab, kaabayaal tayo leh, nafaqada isboortiga iyo alaabooyin dhireed, oo si fudud loo dalbado, laguuna keeno gudaha Hargeysa.",
+    },
+    consultation: {
+      title: "Ballanso La-talin Fayo-qab – Daryeel Wellness Hargeysa",
+      description:
+        "Ballanso la-talin fayo-qab dabiici ah oo Daryeel Wellness, Hargeysa, online ama fool-ka-fool, oo hel hagid shakhsi ah oo ku saabsan kaabayaasha.",
+    },
+    contact: {
+      title: "Nala Soo Xiriir – Daryeel Wellness, Hargeysa",
+      description:
+        "La xiriir Daryeel Wellness oo ku taal Hargeysa, Somaliland: WhatsApp +252 63 8000227, telefoon 0634029802 / 0637999938 iyo iimayl.",
+    },
+    category: {
+      title: "{name} Hargeysa | Daryeel Wellness",
+      description: "{description} Ka dalbo WhatsApp Daryeel Wellness, Hargeysa.",
+    },
+    product: {
+      title: "{name} – Ka iibso Hargeysa | Daryeel Wellness",
+      description: "{description} Ka dalbo WhatsApp Daryeel Wellness, Hargeysa.",
+    },
+  },
   notFound: {
     title: "Boggan jidkii wuu ka leexday.",
     text: "Bogga aad raadinayso ma jiro ama meel kale ayaa loo raray.",
